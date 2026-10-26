@@ -1,0 +1,7 @@
+*
+!Containerfile
+!server.lock
+!dist/
+!dist/**
+!src/
+!src/server.js

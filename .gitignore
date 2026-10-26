@@ -1,0 +1,13 @@
+node_modules/
+dist/
+.DS_Store
+.impeccable/review/
+.vite/
+.env
+.env.*
+!.env.example
+
+.idea/
+assets/source-drawings/
+assets/audio/budget.json
+assets/audio/**/*.mp3.json

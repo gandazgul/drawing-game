@@ -1,0 +1,19 @@
+{
+  "nodeModulesDir": "auto",
+  "tasks": {
+    "dev": "deno run -A npm:vite@8.0.8 --host 127.0.0.1",
+    "build": "deno run -A npm:vite@8.0.8 build",
+    "preview": "deno run -A npm:vite@8.0.8 preview --host 127.0.0.1",
+    "test": "deno test tests/",
+    "check": "deno lint src scripts tests && deno fmt --check src scripts tests index.html style.css deno.json vite.config.js",
+    "voices:audition": "deno run --allow-run=gcloud --allow-net=texttospeech.googleapis.com --allow-read=assets/audio/auditions --allow-write=assets/audio/auditions scripts/voice-audition.js",
+    "voices:dialogue": "deno run --allow-run=gcloud,ffprobe --allow-net=texttospeech.googleapis.com --allow-read=assets/audio --allow-write=assets/audio scripts/voice-dialogue.js"
+  },
+  "imports": {
+    "sharp": "npm:sharp@0.34.5",
+    "@caper/engine": "../Caper/mod.js",
+    "phaser": "npm:phaser@3.90.0",
+    "@std/assert": "jsr:@std/assert@^1.0.19"
+  },
+  "fmt": { "lineWidth": 110, "indentWidth": 2 }
+}
