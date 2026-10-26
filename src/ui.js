@@ -1,4 +1,4 @@
-import { store } from "@caper/engine";
+import { store } from "@gandazgul/caper-engine";
 import { art } from "./art.js";
 import { VoicePlayer } from "./VoicePlayer.js";
 import { voiceURL } from "./voice-assets.js";
@@ -65,8 +65,8 @@ export class GameUI {
           gem && inn && house
             ? "Every color is back! Our heart amulet is whole again."
             : inn && house
-            ? "Only the little heart gem is missing. Our forest friend saw it at Bounka's workshop."
-            : "We kept the outside heart. Help our village friends find the two heart rings."
+              ? "Only the little heart gem is missing. Our forest friend saw it at Bounka's workshop."
+              : "We kept the outside heart. Help our village friends find the two heart rings."
         }</p>`,
       );
       const paths = document.querySelectorAll(".heart-display path");
@@ -74,12 +74,14 @@ export class GameUI {
       paths[2]?.classList.toggle("missing", !house);
       paths[3]?.classList.toggle("missing", !gem);
       paths[3]?.classList.add("center-gem");
-      document.querySelector(".heart-display")?.setAttribute(
-        "aria-label",
-        `Purple heart frame. Pink inn ring ${inn ? "found" : "missing"}. Gold house ring ${
-          house ? "found" : "missing"
-        }. Teal center gem ${gem ? "found" : "missing"}.`,
-      );
+      document
+        .querySelector(".heart-display")
+        ?.setAttribute(
+          "aria-label",
+          `Purple heart frame. Pink inn ring ${inn ? "found" : "missing"}. Gold house ring ${
+            house ? "found" : "missing"
+          }. Teal center gem ${gem ? "found" : "missing"}.`,
+        );
     };
     $("hint").onclick = () => {
       this.hintRequested = true;
@@ -129,14 +131,18 @@ export class GameUI {
       longPress: () => this.confirmReset(true),
     });
     $("restart-all").onclick = () => this.confirmReset(true);
-    document.addEventListener("pointerdown", (event) => {
-      if (this.settingsOpen && !$("settings-wrap").contains(event.target)) {
-        this.toggleSettings(false);
-        // Dismissing the menu must not also click a world hotspot beneath it.
-        event.preventDefault();
-        event.stopImmediatePropagation();
-      }
-    }, true);
+    document.addEventListener(
+      "pointerdown",
+      (event) => {
+        if (this.settingsOpen && !$("settings-wrap").contains(event.target)) {
+          this.toggleSettings(false);
+          // Dismissing the menu must not also click a world hotspot beneath it.
+          event.preventDefault();
+          event.stopImmediatePropagation();
+        }
+      },
+      true,
+    );
     document.addEventListener("keydown", (event) => {
       if (this.settingsOpen) {
         if (event.key === "Escape") {
@@ -149,9 +155,9 @@ export class GameUI {
           const nodes = [
             $("settings"),
             ...$("settings-menu").querySelectorAll("button:not(:disabled), summary"),
-          ]
-            .filter((node) => node.getClientRects().length);
-          const first = nodes[0], last = nodes.at(-1);
+          ].filter((node) => node.getClientRects().length);
+          const first = nodes[0],
+            last = nodes.at(-1);
           if (event.shiftKey && document.activeElement === first) {
             event.preventDefault();
             last.focus();
@@ -165,7 +171,8 @@ export class GameUI {
         if (event.key === "Escape") this.closePanel();
         if (event.key === "Tab") {
           const nodes = [...$("panel").querySelectorAll("button:not(:disabled), [tabindex='0']")];
-          const first = nodes[0], last = nodes.at(-1);
+          const first = nodes[0],
+            last = nodes.at(-1);
           if (event.shiftKey && (document.activeElement === first || document.activeElement === $("panel"))) {
             event.preventDefault();
             last?.focus();
@@ -214,7 +221,10 @@ export class GameUI {
     }
     $("restart").disabled = this.busy;
     $("restart-all").disabled = this.busy;
-    $("settings").disabled = this.panelOpen || !this.scene || this.scene.scriptedTravel ||
+    $("settings").disabled =
+      this.panelOpen ||
+      !this.scene ||
+      this.scene.scriptedTravel ||
       (this.busy && this.scene?.boatJourney?.phase !== undefined && this.scene.boatJourney.phase !== "done");
     $("sticker-dot").hidden = stickerCount(store.list("stickers")) === 0;
   }

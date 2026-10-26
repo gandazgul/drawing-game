@@ -1,4 +1,4 @@
-import { store } from "@caper/engine";
+import { store } from "@gandazgul/caper-engine";
 import { WorldScene } from "./WorldScene.js";
 import { drawing, drawnCritters } from "../DrawnWorld.js";
 import { exitArrow, objectTarget, worldTarget } from "../WorldInteraction.js";
@@ -17,7 +17,7 @@ export class TreeClearing extends WorldScene {
       key: "TreeClearing",
       backgroundsByChapter: { paint: "endingDry" },
       walkable: treeWalkable(false),
-      characterScales: { keila: .16, olivia: .165 },
+      characterScales: { keila: 0.16, olivia: 0.165 },
       companionSpacing: 85,
       activeCharacter: { startPosition: { x: 205, y: 710 } },
       props: [],
@@ -34,7 +34,8 @@ export class TreeClearing extends WorldScene {
     this.layoutVariant = "shared-tree-v1";
     super.create(data);
     this.ui.setScene(this, "Our tree house");
-    this.background.setTexture(store.get("endingWaterDone") && !arrival ? "endingWater" : "endingDry")
+    this.background
+      .setTexture(store.get("endingWaterDone") && !arrival ? "endingWater" : "endingDry")
       .setDisplaySize(1200, 800);
     this.houses = treeHouses(this, store.get("endingHouseDone"));
     finaleFruit(this);
@@ -44,11 +45,8 @@ export class TreeClearing extends WorldScene {
     this.bounka = drawing(this, "bounkaKind", party ? 620 : 560, 715, 105, 6);
     this.bear = createBear(this, party ? 760 : 700, 713, 145);
     this.creature = drawing(this, "forestCreature", party ? 420 : 820, 717, 85, 6);
-    objectTarget(
-      this,
-      "bounka",
-      this.bounka,
-      () => this.ui.dialogue(canCelebrate(store.values) ? DIALOGUE.endingFinished : DIALOGUE.endingWelcome),
+    objectTarget(this, "bounka", this.bounka, () =>
+      this.ui.dialogue(canCelebrate(store.values) ? DIALOGUE.endingFinished : DIALOGUE.endingWelcome),
     );
     objectTarget(this, "bear", this.bear, () => this.dance());
     objectTarget(this, "forest-friend", this.creature, () => {
@@ -56,11 +54,14 @@ export class TreeClearing extends WorldScene {
       this.ui.speak("Keila", "We can make this together.");
     });
     const syncFriends = () => {
-      for (
-        const [id, sprite] of [["bounka", this.bounka], ["bear", this.bear], ["forest-friend", this.creature]]
-      ) {
+      for (const [id, sprite] of [
+        ["bounka", this.bounka],
+        ["bear", this.bear],
+        ["forest-friend", this.creature],
+      ]) {
         if (this.editor.active) continue;
-        const z = this.hotspots.zones.get(id), b = sprite.getBounds();
+        const z = this.hotspots.zones.get(id),
+          b = sprite.getBounds();
         if (!z?.input) continue;
         z.setPosition(b.x, b.y).setSize(b.width, b.height);
         z.input.hitArea.setSize(b.width, b.height);
@@ -96,27 +97,24 @@ export class TreeClearing extends WorldScene {
       if (canCelebrate(store.values)) this.scene.start("TreeDecorate");
       else this.hint();
     });
-    this.bell = drawing(this, "partyBell", 835, 338, 90, 8).setOrigin(.5, 0);
+    this.bell = drawing(this, "partyBell", 835, 338, 90, 8).setOrigin(0.5, 0);
     // New ID prevents old editor layouts restoring the former floating target.
     worldTarget(this, "hanging-party-bell", { x: 775, y: 355, w: 120, h: 130 }, () => {
       ringPartyBell(this, this.bell);
       if (canCelebrate(store.values)) this.celebrate();
       else this.hint();
     });
-    this.goodbyeButton = this.add.text(
-      970,
-      755,
-      store.get("endingPortalReady") ? "Our heart doorway" : "Say goodbye",
-      {
+    this.goodbyeButton = this.add
+      .text(970, 755, store.get("endingPortalReady") ? "Our heart doorway" : "Say goodbye", {
         ...font,
         fontSize: "26px",
         color: "#fff9e9",
         backgroundColor: "#66418d",
         padding: { x: 16, y: 12 },
-      },
-    ).setOrigin(.5).setDepth(20).setVisible(
-      canSayGoodbye(store.values),
-    );
+      })
+      .setOrigin(0.5)
+      .setDepth(20)
+      .setVisible(canSayGoodbye(store.values));
     fingerRect(this, this.goodbyeButton, 48);
     this.goodbyeButton.on("pointerdown", (_p, _x, _y, e) => {
       e.stopPropagation();
@@ -141,12 +139,12 @@ export class TreeClearing extends WorldScene {
       !store.get("endingWaterDone")
         ? "The pool is dry. Tap it to connect the pipes."
         : !store.get("endingHouseDone")
-        ? "Tap a pale house in the branches to put its pieces together."
-        : !store.get("endingRouteDone")
-        ? "Tap the pale path on the right. Draw a way up and across."
-        : !store.get("endingParty")
-        ? "Tap the flower bouquet to decorate freely. Ring the golden bell whenever you're ready!"
-        : "Our place, together. Decorate, pop bubbles, dance, or say goodbye whenever you're ready.",
+          ? "Tap a pale house in the branches to put its pieces together."
+          : !store.get("endingRouteDone")
+            ? "Tap the pale path on the right. Draw a way up and across."
+            : !store.get("endingParty")
+              ? "Tap the flower bouquet to decorate freely. Ring the golden bell whenever you're ready!"
+              : "Our place, together. Decorate, pop bubbles, dance, or say goodbye whenever you're ready.",
     );
   }
   fillPool() {
@@ -172,7 +170,7 @@ export class TreeClearing extends WorldScene {
     const keys = ["fish", "axolotlBlue", "axolotlPink", "seaCreature"];
     drawnCritters(
       this,
-      keys.map((k, i) => [k, 160 + i * 66, 555 + i % 2 * 23, k === "seaCreature" ? 48 : 62, "custom"]),
+      keys.map((k, i) => [k, 160 + i * 66, 555 + (i % 2) * 23, k === "seaCreature" ? 48 : 62, "custom"]),
     );
     if (arrive && !this.registry.get("reducedMotion")) {
       for (const { sprite } of this.critterEntries.slice(-4)) {
@@ -260,12 +258,11 @@ export class TreeClearing extends WorldScene {
   partyFriends() {
     if (this.partyPresent) return;
     this.partyPresent = true;
-    drawnCritters(this, [["bird", 360, 700, 72, "ground"], ["heartButterfly", 220, 290, 65], [
-      "watermelon",
-      1030,
-      140,
-      110,
-    ]]);
+    drawnCritters(this, [
+      ["bird", 360, 700, 72, "ground"],
+      ["heartButterfly", 220, 290, 65],
+      ["watermelon", 1030, 140, 110],
+    ]);
     drawing(this, "blueCat", 480, 320, 65, 5);
     drawing(this, "mouse", 690, 327, 60, 5);
     drawing(this, "birthdayFriend", 325, 715, 85, 5);
@@ -276,17 +273,18 @@ export class TreeClearing extends WorldScene {
     for (let i = 0; i < 5; i++) this.bubble(i);
   }
   bubble(i) {
-    const x = 125 + i * 74, y = 420 - i % 2 * 70;
+    const x = 125 + i * 74,
+      y = 420 - (i % 2) * 70;
     const b = fingerCircle(
       this,
-      this.add.circle(x, y, 24, 0xffffff, .32).setStrokeStyle(3, 0xfff9e9).setDepth(15),
+      this.add.circle(x, y, 24, 0xffffff, 0.32).setStrokeStyle(3, 0xfff9e9).setDepth(15),
     );
     b.on("pointerdown", (_p, _x, _y, e) => {
       e.stopPropagation();
       if (this.blocked) return;
       sparkleBurst(this, b.x, b.y);
       b.destroy();
-      if (this.ui.effectsOn) this.sound.play("bubblePop", { volume: .3 });
+      if (this.ui.effectsOn) this.sound.play("bubblePop", { volume: 0.3 });
       this.time.delayedCall(1600, () => this.bubble(i));
     });
   }
@@ -300,7 +298,12 @@ export class TreeClearing extends WorldScene {
       store.set("endingParty", true);
       this.partyFriends();
       this.dance();
-      for (const [x, y] of [[400, 230], [700, 150], [940, 260]]) sparkleBurst(this, x, y, true);
+      for (const [x, y] of [
+        [400, 230],
+        [700, 150],
+        [940, 260],
+      ])
+        sparkleBurst(this, x, y, true);
       this.scriptedTravel = false;
       this.ui.setBusy(false);
       this.goodbyeButton.setVisible(true);
@@ -316,18 +319,20 @@ export class TreeClearing extends WorldScene {
       if (reduced) {
         w.sprite.setPosition(target.x, target.y);
         if (--count === 0) finish();
-      } else {w.walkTo(target, () => {
+      } else {
+        w.walkTo(target, () => {
           if (--count === 0) finish();
-        });}
+        });
+      }
     }
   }
   goodbye() {
     if (!canSayGoodbye(store.values)) return;
     if (store.get("endingGoodbyeSeen")) return this.scene.start("TreePortal");
     // The keepsake is a miniature of this actual finished clearing, including saved decorations.
-    const capture = this.add.renderTexture(600, 340, 1200, 800).setOrigin(.5).setDepth(35);
+    const capture = this.add.renderTexture(600, 340, 1200, 800).setOrigin(0.5).setDepth(35);
     capture.draw(this.children.list.filter((o) => o !== capture && o.visible && o.depth < 15));
-    capture.setScale(.4);
+    capture.setScale(0.4);
     const paper = this.add.rectangle(600, 340, 500, 340, 0xfff9e9).setStrokeStyle(4, 0x66418d).setDepth(34);
     this.ui.dialogue(DIALOGUE.endingGoodbye, () => {
       store.set("endingGoodbyeSeen", true);
@@ -341,10 +346,10 @@ export class TreeClearing extends WorldScene {
       !store.get("endingWaterDone")
         ? DIALOGUE.endingPipes
         : !store.get("endingHouseDone")
-        ? DIALOGUE.endingHouse
-        : !store.get("endingRouteDone")
-        ? DIALOGUE.endingRoute
-        : DIALOGUE.endingDecorate,
+          ? DIALOGUE.endingHouse
+          : !store.get("endingRouteDone")
+            ? DIALOGUE.endingRoute
+            : DIALOGUE.endingDecorate,
     );
   }
 }

@@ -1,4 +1,4 @@
-import { store } from "@caper/engine";
+import { store } from "@gandazgul/caper-engine";
 import { WorldScene } from "./WorldScene.js";
 import { BoatView } from "../BoatView.js";
 import { drawHeart } from "../art.js";
@@ -12,7 +12,12 @@ export class Harbor extends WorldScene {
     super({
       key: "Harbor",
       backgroundsByChapter: { paint: "harbor" },
-      walkable: [{ x: 80, y: 610 }, { x: 800, y: 610 }, { x: 800, y: 690 }, { x: 80, y: 690 }],
+      walkable: [
+        { x: 80, y: 610 },
+        { x: 800, y: 610 },
+        { x: 800, y: 690 },
+        { x: 80, y: 690 },
+      ],
       activeCharacter: { startPosition: { x: 340, y: 655 } },
       props: [
         {
@@ -25,10 +30,13 @@ export class Harbor extends WorldScene {
           id: "sticker",
           bounds: { x: 90, y: 520, w: 90, h: 75 },
           approach: { x: 190, y: 638, facing: "up" },
-          states: [{ when: { stickers: { has: "harbor-fish" } } }, {
-            cursor: "pointer",
-            onClick: [{ emit: "sticker" }],
-          }],
+          states: [
+            { when: { stickers: { has: "harbor-fish" } } },
+            {
+              cursor: "pointer",
+              onClick: [{ emit: "sticker" }],
+            },
+          ],
         },
         {
           id: "sea",
@@ -48,20 +56,16 @@ export class Harbor extends WorldScene {
     super.create(data);
     this.ui.setScene(this, "The painted harbor");
     swimmingCreatures(this);
-    this.boat = new BoatView(this, 970, 460, .69);
-    this.sticker = this.add.image(123, 558, "fish").setDisplaySize(82, 55).setAngle(-22).setDepth(2)
+    this.boat = new BoatView(this, 970, 460, 0.69);
+    this.sticker = this.add
+      .image(123, 558, "fish")
+      .setDisplaySize(82, 55)
+      .setAngle(-22)
+      .setDepth(2)
       .setVisible(!store.has("stickers", "harbor-fish"));
     this.bus.on("boat", () => this.onBoat());
     this.bus.on("sticker", () => this.collectSticker());
-    this.bus.on(
-      "sea",
-      () =>
-        this.ui.dialogue(
-          DIALOGUE.sea,
-          () => {},
-          "Explore",
-        ),
-    );
+    this.bus.on("sea", () => this.ui.dialogue(DIALOGUE.sea, () => {}, "Explore"));
     this.ui.status("Tap to walk. Tap the boat to see what it needs.");
     if (arrivingByBoat) arriveByBoat(this);
     else if (!store.get("arrived")) this.arrival();
@@ -73,7 +77,8 @@ export class Harbor extends WorldScene {
     const reduced = this.registry.get("reducedMotion");
     const sprites = [this.walk.sprite, ...this.idleCharacters.map((c) => c.sprite)];
     for (let i = 0; i < sprites.length; i++) {
-      const sprite = sprites[i], endY = sprite.y;
+      const sprite = sprites[i],
+        endY = sprite.y;
       sprite.y = -80 - i * 130;
       this.tweens.add({
         targets: sprite,
@@ -92,7 +97,7 @@ export class Harbor extends WorldScene {
           size,
           [0x70438f, 0xd76b94, 0xd9ac36, 0x328b9c][i],
           i === 3,
-        ).setPosition(325, 530)
+        ).setPosition(325, 530),
       );
       layers.slice(1).forEach((part, i) =>
         this.tweens.add({
@@ -103,16 +108,12 @@ export class Harbor extends WorldScene {
           duration: reduced ? 1 : 1400,
           ease: "Sine.easeOut",
           onComplete: () => part.destroy(),
-        })
+        }),
       );
       this.time.delayedCall(reduced ? 80 : 1550, () => {
         layers[0].destroy();
         this.activeMarker.setVisible(true);
-        this.ui.dialogue(
-          DIALOGUE.arrival,
-          () => store.set("arrived", true),
-          "Explore the harbor",
-        );
+        this.ui.dialogue(DIALOGUE.arrival, () => store.set("arrived", true), "Explore the harbor");
       });
     });
   }
@@ -146,8 +147,8 @@ export class Harbor extends WorldScene {
       repair === "sail"
         ? DIALOGUE.harborSailHint
         : repair === "patch"
-        ? DIALOGUE.harborPatchHint
-        : DIALOGUE.harborReadyHint,
+          ? DIALOGUE.harborPatchHint
+          : DIALOGUE.harborReadyHint,
       () => {},
       "Try it",
     );

@@ -1,12 +1,33 @@
 // One scene-owned journey: shore walk → board → sail → dock → step ashore.
 // Nothing transient is saved; reloading always returns to a playable shore.
 export const BOAT_LANDINGS = {
-  Port: { shore: [{ x: 610, y: 720 }, { x: 555, y: 710 }], dockShift: { x: -135, y: 0 } },
-  Pond: { shore: [{ x: 230, y: 635 }, { x: 310, y: 650 }], dockShift: { x: 0, y: 0 } },
-  Harbor: { shore: [{ x: 785, y: 650 }, { x: 710, y: 650 }], dockShift: { x: 0, y: 0 } },
+  Port: {
+    shore: [
+      { x: 610, y: 720 },
+      { x: 555, y: 710 },
+    ],
+    dockShift: { x: -135, y: 0 },
+  },
+  Pond: {
+    shore: [
+      { x: 230, y: 635 },
+      { x: 310, y: 650 },
+    ],
+    dockShift: { x: 0, y: 0 },
+  },
+  Harbor: {
+    shore: [
+      { x: 785, y: 650 },
+      { x: 710, y: 650 },
+    ],
+    dockShift: { x: 0, y: 0 },
+  },
 };
-const seats = [{ x: -135, y: 178 }, { x: 80, y: 178 }];
-const passengerScale = .36;
+const seats = [
+  { x: -135, y: 178 },
+  { x: 80, y: 178 },
+];
+const passengerScale = 0.36;
 
 export function takeBoatArrival(data) {
   const arriving = data?.boatArrival === true;
@@ -26,7 +47,9 @@ function trip(scene) {
     depth: w.sprite.depth,
   }));
   const reduced = scene.registry.get("reducedMotion");
-  const boat = scene.boat, root = boat.root, landing = BOAT_LANDINGS[scene.scene.key];
+  const boat = scene.boat,
+    root = boat.root,
+    landing = BOAT_LANDINGS[scene.scene.key];
   const boatScale = Math.abs(root.scaleX);
   const face = (direction) => {
     root.setScale(direction * boatScale, root.scaleY);
@@ -58,7 +81,11 @@ function trip(scene) {
   const seat = (i) => ({ x: root.x + seats[i].x * root.scaleX, y: root.y + seats[i].y * root.scaleY });
   const passengers = () => {
     pose();
-    boat.showPassengers(walkers.map((w) => w.sprite), seats, passengerScale);
+    boat.showPassengers(
+      walkers.map((w) => w.sprite),
+      seats,
+      passengerScale,
+    );
     walkers.forEach((w) => w.sprite.setVisible(false));
   };
   const sail = (target, phase, done) => {
@@ -110,43 +137,46 @@ export function departByBoat(scene, destination) {
   t.face(t.dock.x < t.root.x ? -1 : 1);
   t.journey.destination = destination;
   // Let the boat draw alongside while both sisters follow the real shore/bridge.
-  t.together([
-    (done) => t.tween(t.root, t.dock, 650, done),
-    ...t.walkers.map((w, i) => (done) => {
-      const target = w.snapToWalkable(t.landing.shore[i]);
-      if (t.reduced) {
-        w.teleportTo(target, "down");
-        done();
-      } else {
-        w.unlock();
-        w.walkTo(target, () => {
-          w.lock();
+  t.together(
+    [
+      (done) => t.tween(t.root, t.dock, 650, done),
+      ...t.walkers.map((w, i) => (done) => {
+        const target = w.snapToWalkable(t.landing.shore[i]);
+        if (t.reduced) {
+          w.teleportTo(target, "down");
           done();
-        });
-      }
-    }),
-  ], () => {
-    t.journey.phase = "boarding";
-    t.face(1);
-    t.pose();
-    t.walkers.forEach((w) => w.sprite.setDepth(9));
-    t.together(
-      t.walkers.map((w, i) => (done) => {
-        t.tween(
-          w.sprite,
-          { ...t.seat(i), scaleX: passengerScale * t.boatScale, scaleY: passengerScale * t.root.scaleY },
-          500,
-          done,
-        );
+        } else {
+          w.unlock();
+          w.walkTo(target, () => {
+            w.lock();
+            done();
+          });
+        }
       }),
-      () => {
-        t.passengers();
-        t.sail({ x: 1500, y: Math.max(340, t.dock.y - 75) }, "departing", () => {
-          scene.scene.start(destination, { boatArrival: true });
-        });
-      },
-    );
-  });
+    ],
+    () => {
+      t.journey.phase = "boarding";
+      t.face(1);
+      t.pose();
+      t.walkers.forEach((w) => w.sprite.setDepth(9));
+      t.together(
+        t.walkers.map((w, i) => (done) => {
+          t.tween(
+            w.sprite,
+            { ...t.seat(i), scaleX: passengerScale * t.boatScale, scaleY: passengerScale * t.root.scaleY },
+            500,
+            done,
+          );
+        }),
+        () => {
+          t.passengers();
+          t.sail({ x: 1500, y: Math.max(340, t.dock.y - 75) }, "departing", () => {
+            scene.scene.start(destination, { boatArrival: true });
+          });
+        },
+      );
+    },
+  );
 }
 
 export function arriveByBoat(scene, done) {
@@ -166,7 +196,11 @@ export function arriveByBoat(scene, done) {
       t.boat.clearPassengers();
       t.walkers.forEach((w, i) => {
         const p = t.seat(i);
-        w.sprite.setPosition(p.x, p.y).setScale(passengerScale * t.boatScale).setDepth(9).setVisible(true);
+        w.sprite
+          .setPosition(p.x, p.y)
+          .setScale(passengerScale * t.boatScale)
+          .setDepth(9)
+          .setVisible(true);
       });
       t.together(
         t.walkers.map((w, i) => (next) => {

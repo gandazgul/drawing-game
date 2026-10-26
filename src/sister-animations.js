@@ -9,7 +9,9 @@ const directions = ["front", "side", "back"];
 const key = (id, suffix) => `character_${id}_${suffix}`;
 
 export function sisterAnimationConfig(id, reducedMotion = false) {
-  const animationSet = {}, animationScales = {}, animationOrigins = {};
+  const animationSet = {},
+    animationScales = {},
+    animationOrigins = {};
   for (const direction of directions) {
     const entry = { still: key(id, `${direction}_still`) };
     if (!reducedMotion) entry.walk = key(id, `${direction}_walk`);
@@ -18,7 +20,7 @@ export function sisterAnimationConfig(id, reducedMotion = false) {
     for (const name of Object.values(entry)) {
       // The original puppets used 1024px-tall sources; all new cells are 512px.
       animationScales[name] = 2;
-      animationOrigins[name] = { x: .5, y: SISTER_FRAME.ground / SISTER_FRAME.height };
+      animationOrigins[name] = { x: 0.5, y: SISTER_FRAME.ground / SISTER_FRAME.height };
     }
   }
   return { animationSet, animationScales, animationOrigins };
@@ -35,16 +37,19 @@ export function preloadSisterAnimations(scene) {
 
 export function createSisterAnimations(scene) {
   for (const id of Object.keys(SISTER_ATLASES)) {
-    const atlas = key(id, "atlas"), source = scene.textures.get(atlas).getSourceImage();
+    const atlas = key(id, "atlas"),
+      source = scene.textures.get(atlas).getSourceImage();
     directions.forEach((direction, row) => {
       const stillIndex = [12, 14, 15][row];
       const texture = scene.textures.addImage(key(id, `${direction}_still`), source);
-      texture.get().setSize(
-        SISTER_FRAME.width,
-        SISTER_FRAME.height,
-        stillIndex % 4 * SISTER_FRAME.width,
-        Math.floor(stillIndex / 4) * SISTER_FRAME.height,
-      );
+      texture
+        .get()
+        .setSize(
+          SISTER_FRAME.width,
+          SISTER_FRAME.height,
+          (stillIndex % 4) * SISTER_FRAME.width,
+          Math.floor(stillIndex / 4) * SISTER_FRAME.height,
+        );
       scene.anims.create({
         key: key(id, `${direction}_walk`),
         frames: scene.anims.generateFrameNumbers(atlas, { start: row * 4, end: row * 4 + 3 }),
@@ -54,11 +59,15 @@ export function createSisterAnimations(scene) {
     });
     scene.anims.create({
       key: key(id, "blink"),
-      frames: [{ key: atlas, frame: 12, duration: 100 }, { key: atlas, frame: 13, duration: 110 }, {
-        key: atlas,
-        frame: 12,
-        duration: 100,
-      }],
+      frames: [
+        { key: atlas, frame: 12, duration: 100 },
+        { key: atlas, frame: 13, duration: 110 },
+        {
+          key: atlas,
+          frame: 12,
+          duration: 100,
+        },
+      ],
       frameRate: 1000,
       repeat: 0,
     });

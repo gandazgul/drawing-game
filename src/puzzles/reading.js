@@ -91,28 +91,49 @@ export function wordSetIndex(value) {
   return Number.isInteger(value) && value >= 0 && value < WORD_SETS.length ? value : 0;
 }
 export function readingSession(raw, set) {
-  const words = raw?.set === set && Array.isArray(raw.words)
-    ? [...new Set(raw.words.filter((word) => WORD_SETS[wordSetIndex(set)].includes(word)))]
-    : [];
-  const placed = words.length === 4 && Array.isArray(raw?.placed)
-    ? [...new Set(raw.placed.filter((id) => PLACEMENTS.some((p) => p.id === id)))]
-    : [];
+  const words =
+    raw?.set === set && Array.isArray(raw.words)
+      ? [...new Set(raw.words.filter((word) => WORD_SETS[wordSetIndex(set)].includes(word)))]
+      : [];
+  const placed =
+    words.length === 4 && Array.isArray(raw?.placed)
+      ? [...new Set(raw.placed.filter((id) => PLACEMENTS.some((p) => p.id === id)))]
+      : [];
   return { set: wordSetIndex(set), words, placed };
 }
 export function wordRounds(set = 0, random = Math.random) {
   const pool = WORD_SETS[wordSetIndex(set)];
   return shuffled(pool, random).map((answer) => ({
     answer,
-    choices: shuffled([answer, ...shuffled(pool.filter((w) => w !== answer), random).slice(0, 2)], random),
+    choices: shuffled(
+      [
+        answer,
+        ...shuffled(
+          pool.filter((w) => w !== answer),
+          random,
+        ).slice(0, 2),
+      ],
+      random,
+    ),
   }));
 }
 export const DECORATION_ART = ["pinkFruit", "birthdayFlowers", "flowerBlue", "heartButterfly"];
 export function validPicnicDecorations(raw) {
   if (!Array.isArray(raw)) return [];
-  return raw.slice(0, 24).filter((p) =>
-    p && DECORATION_ART.includes(p.art) && Number.isFinite(p.x) && Number.isFinite(p.y) &&
-    p.x >= 120 && p.x <= 1100 && p.y >= 350 && p.y <= 650
-  ).map(({ art, x, y }) => ({ art, x, y }));
+  return raw
+    .slice(0, 24)
+    .filter(
+      (p) =>
+        p &&
+        DECORATION_ART.includes(p.art) &&
+        Number.isFinite(p.x) &&
+        Number.isFinite(p.y) &&
+        p.x >= 120 &&
+        p.x <= 1100 &&
+        p.y >= 350 &&
+        p.y <= 650,
+    )
+    .map(({ art, x, y }) => ({ art, x, y }));
 }
 export const CLOUD_LINES = {
   welcome:

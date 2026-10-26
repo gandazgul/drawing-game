@@ -1,4 +1,4 @@
-import { store } from "@caper/engine";
+import { store } from "@gandazgul/caper-engine";
 import { art, drawHeart } from "./art.js";
 import { drawing } from "./DrawnWorld.js";
 import { branchDone, BRANCHES, doneTasks, villageDone } from "./village-progress.js";
@@ -27,9 +27,8 @@ export function reward(scene, branch) {
     drawHeart(g, 600, 355, branch === "inn" ? 85 : 60, branch === "inn" ? 0xe26487 : 0xe6ad24);
     scene.time.delayedCall(2200, () => g.destroy());
   }
-  scene.ui.dialogue(
-    [DIALOGUE.villageFinds[branch === "inn" ? 0 : branch === "house" ? 1 : 2]],
-    () => messenger(scene),
+  scene.ui.dialogue([DIALOGUE.villageFinds[branch === "inn" ? 0 : branch === "house" ? 1 : 2]], () =>
+    messenger(scene),
   );
 }
 export function messenger(scene) {
@@ -45,13 +44,14 @@ export function forest(scene) {
   if (missing.length) {
     scene.ui.openPanel(
       "Before the forest…",
-      `<p>Our friends still need a hand.</p><div style="display:flex;gap:24px;justify-content:center">${
-        missing.map(([, b]) =>
-          `<figure><img src="${
-            art[b.art]
-          }" alt="${b.name}" style="width:100px;height:110px;object-fit:contain"><figcaption>${b.name}</figcaption></figure>`
-        ).join("")
-      }</div>`,
+      `<p>Our friends still need a hand.</p><div style="display:flex;gap:24px;justify-content:center">${missing
+        .map(
+          ([, b]) =>
+            `<figure><img src="${
+              art[b.art]
+            }" alt="${b.name}" style="width:100px;height:110px;object-fit:contain"><figcaption>${b.name}</figcaption></figure>`,
+        )
+        .join("")}</div>`,
     );
     scene.ui.panelButton("Back to our friends", () => scene.ui.closePanel());
   } else scene.scene.start("ForestEdge");

@@ -1,4 +1,4 @@
-import { store } from "@caper/engine";
+import { store } from "@gandazgul/caper-engine";
 import { WorldScene } from "./WorldScene.js";
 import { BoatView } from "../BoatView.js";
 import { exitArrow, objectTarget } from "../WorldInteraction.js";
@@ -14,7 +14,12 @@ export class Pond extends WorldScene {
     super({
       key: "Pond",
       backgroundsByChapter: { paint: "pond" },
-      walkable: [{ x: 80, y: 610 }, { x: 420, y: 645 }, { x: 535, y: 725 }, { x: 100, y: 705 }],
+      walkable: [
+        { x: 80, y: 610 },
+        { x: 420, y: 645 },
+        { x: 535, y: 725 },
+        { x: 100, y: 705 },
+      ],
       activeCharacter: { startPosition: { x: 320, y: 675 } },
       props: [],
     });
@@ -28,7 +33,7 @@ export class Pond extends WorldScene {
     drawnCritters(this, [CHICKEN_WALKS.Pond]);
     swimmingCreatures(this);
     hiddenStickers(this);
-    this.boat = new BoatView(this, 210, 437, .49);
+    this.boat = new BoatView(this, 210, 437, 0.49);
     this.mermaid = trackArt(
       this,
       "little-mermaid",
@@ -54,8 +59,8 @@ export class Pond extends WorldScene {
       store.get("waterwayDone") && store.get("pondClue")
         ? "The way to the village is open. Our underwater friends are still here to visit."
         : store.get("metMermaid")
-        ? "Dive with our friend to visit the world below the pond."
-        : "A little mermaid is waving. Meet her before following her underwater.",
+          ? "Dive with our friend to visit the world below the pond."
+          : "A little mermaid is waving. Meet her before following her underwater.",
     );
     const welcome = () => {
       if (!store.get("metMermaid")) this.ui.dialogue(DIALOGUE.pondArrival, () => {}, "Say hello");
@@ -69,10 +74,14 @@ export class Pond extends WorldScene {
       this.scene.start("Underwater");
       return;
     }
-    this.ui.dialogue(DIALOGUE.mermaid, () => {
-      store.set("metMermaid", true);
-      this.scene.start("Underwater");
-    }, "Follow her underwater");
+    this.ui.dialogue(
+      DIALOGUE.mermaid,
+      () => {
+        store.set("metMermaid", true);
+        this.scene.start("Underwater");
+      },
+      "Follow her underwater",
+    );
   }
   goToPort() {
     if (!store.get("pondClue")) {

@@ -10,13 +10,18 @@ export const INN_ROOMS = [
 
 export const INN_TASK_ROOMS = { luggage: 3, rooms: 2 };
 
-export const validRoom = (id) => Number.isInteger(id) && id >= 0 && id < INN_ROOMS.length ? id : 4;
+export const validRoom = (id) => (Number.isInteger(id) && id >= 0 && id < INN_ROOMS.length ? id : 4);
 export const roomFloor = (id) => {
   const { left, right, floor } = INN_ROOMS[validRoom(id)];
-  return [{ x: left, y: floor - 3 }, { x: right, y: floor - 3 }, { x: right, y: floor + 2 }, {
-    x: left,
-    y: floor + 2,
-  }];
+  return [
+    { x: left, y: floor - 3 },
+    { x: right, y: floor - 3 },
+    { x: right, y: floor + 2 },
+    {
+      x: left,
+      y: floor + 2,
+    },
+  ];
 };
 export const roomTarget = (id, x) => {
   const room = INN_ROOMS[validRoom(id)];

@@ -1,4 +1,4 @@
-import { store } from "@caper/engine";
+import { store } from "@gandazgul/caper-engine";
 import { WorldScene } from "./WorldScene.js";
 import { drawing } from "../DrawnWorld.js";
 import { objectTarget, worldTarget } from "../WorldInteraction.js";
@@ -21,9 +21,14 @@ function config(key, background) {
   return {
     key,
     backgroundsByChapter: { paint: background },
-    walkable: [{ x: 90, y: 540 }, { x: 1110, y: 540 }, { x: 1110, y: 740 }, { x: 90, y: 740 }],
+    walkable: [
+      { x: 90, y: 540 },
+      { x: 1110, y: 540 },
+      { x: 1110, y: 740 },
+      { x: 90, y: 740 },
+    ],
     // Child-height beside the painted doors and workbench, not miniature visitors.
-    characterScales: { keila: .22, olivia: .227 },
+    characterScales: { keila: 0.22, olivia: 0.227 },
     companionSpacing: 120,
     activeCharacter: { startPosition: { x: 260, y: 650 } },
     props: [],
@@ -49,14 +54,26 @@ export class StudioGallery extends WorldScene {
         line(g, { x: b.x + 5, y }, { x: b.right - 5, y: y - 7 }, 0x7250a0, 5);
       }
     }
-    objectTarget(this, "picture", image, () => {
-      if (done) this.ui.dialogue(DIALOGUE.studioPictureThanks);
-      else this.scene.start("WorkshopPicture");
-    }, { x: 600, y: 560 });
-    worldTarget(this, "right-door", { x: 1010, y: 230, w: 150, h: 320 }, () => {
-      if (done) this.scene.start("StudioDark");
-      else this.ui.dialogue(DIALOGUE.studioPictureHelp);
-    }, { x: 1050, y: 550 });
+    objectTarget(
+      this,
+      "picture",
+      image,
+      () => {
+        if (done) this.ui.dialogue(DIALOGUE.studioPictureThanks);
+        else this.scene.start("WorkshopPicture");
+      },
+      { x: 600, y: 560 },
+    );
+    worldTarget(
+      this,
+      "right-door",
+      { x: 1010, y: 230, w: 150, h: 320 },
+      () => {
+        if (done) this.scene.start("StudioDark");
+        else this.ui.dialogue(DIALOGUE.studioPictureHelp);
+      },
+      { x: 1050, y: 550 },
+    );
     worldTarget(
       this,
       "front-door",
@@ -91,14 +108,14 @@ export class StudioWorkroom extends WorldScene {
     this.climaxPhase = null;
     super.create(data);
     this.ui.setScene(this, "Making something with Bounka");
-    const bounka = this.bounka = drawing(
+    const bounka = (this.bounka = drawing(
       this,
       store.get("studioKindEyes") ? "bounkaKind" : "bounka",
       880,
       660,
       210,
       5,
-    );
+    ));
     drawing(this, "flowerVase", 315, 382, 60, 4);
     const done = store.get("studioHomeDone") === true;
     const house = drawing(this, "house", 500, 420, 180, 4);
@@ -111,7 +128,7 @@ export class StudioWorkroom extends WorldScene {
     else HOME_DOOR.slice(1).forEach((p, i) => line(door, map(HOME_DOOR[i]), map(p), 0x7250a0, 1));
     for (const stroke of validStrokes(store.get("studioHomeStrokes"))) {
       stroke.forEach((p, i) =>
-        line(door, map(stroke[i - 1] ?? p), map(p), studioStrokeColor(p, 0xe26487), 12 * scale)
+        line(door, map(stroke[i - 1] ?? p), map(p), studioStrokeColor(p, 0xe26487), 12 * scale),
       );
     }
     const mouse = drawing(
@@ -141,8 +158,8 @@ export class StudioWorkroom extends WorldScene {
       done
         ? "A finished home, and our heart gem back. You can visit all your friends."
         : store.get("studioTreehouseInvited")
-        ? "Our amulet is whole! Bounka wants to finish the tree house together. The little mouse's door is here to try, too."
-        : "Tap Bounka, then help finish the little mouse's door.",
+          ? "Our amulet is whole! Bounka wants to finish the tree house together. The little mouse's door is here to try, too."
+          : "Tap Bounka, then help finish the little mouse's door.",
     );
     if (climaxPending(store.values)) this.time.delayedCall(0, () => this.meet());
     else if (done && !store.get("studioHomeThanked")) {
@@ -242,7 +259,7 @@ export class StudioHome extends PuzzleScene {
       for (const s of this.strokes) {
         s.forEach((p, i) => line(this.ink, s[i - 1] ?? p, p, studioStrokeColor(p, 0xe26487), 12));
       }
-      this.mouse.setPosition(695, 590).setScale(this.mouse.scaleX * .45);
+      this.mouse.setPosition(695, 590).setScale(this.mouse.scaleX * 0.45);
       this.ui.setBusy(true);
       this.feedback.setText("A little door, made together!");
       this.time.delayedCall(700, () => {

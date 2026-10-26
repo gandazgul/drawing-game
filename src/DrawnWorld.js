@@ -1,11 +1,11 @@
-import { createCritters, store } from "@caper/engine";
+import { createCritters, store } from "@gandazgul/caper-engine";
 import { STICKERS } from "./stickers.js";
 import { trackArt } from "./WorldEditor.js";
 import { CHICKEN_PLACEMENT, chickenWalk } from "./chicken.js";
 
 export function drawing(scene, key, x, y, width, depth = 2) {
   if (scene.textures.exists(`${key}Mask`)) key = stickerTexture(scene, key);
-  const image = scene.add.image(x, y, key).setOrigin(.5, 1).setDepth(depth);
+  const image = scene.add.image(x, y, key).setOrigin(0.5, 1).setDepth(depth);
   image.setScale(width / image.width);
   if (scene.artCounts) {
     scene.artCounts[key] = (scene.artCounts[key] ?? 0) + 1;
@@ -21,9 +21,10 @@ export function drawnCritters(scene, specs) {
     scene,
     specs.map(([atlas, x, y, width, type = "butterfly"]) => {
       const source = scene.textures.get(atlas).getSourceImage();
-      const height = width * source.height / source.width;
+      const height = (width * source.height) / source.width;
       const chicken = atlas === "bird";
-      const ampX = chicken ? 80 : 18, ampY = chicken ? 0 : 9;
+      const ampX = chicken ? 80 : 18,
+        ampY = chicken ? 0 : 9;
       return {
         atlas: scene.textures.exists(`${atlas}Mask`) ? stickerTexture(scene, atlas) : atlas,
         x: Math.max(width / 2 + 24, Math.min(scene.scale.width - width / 2 - ampX - 24, x)),
@@ -54,7 +55,7 @@ export function drawnCritters(scene, specs) {
 // Use drawing() so each piece stays independently movable in the world editor.
 export function treeFruit(scene, placements) {
   return placements.map(([x, y, width, angle = 0]) =>
-    drawing(scene, "pinkFruit", x, y, width, 1).setAngle(angle)
+    drawing(scene, "pinkFruit", x, y, width, 1).setAngle(angle),
   );
 }
 
@@ -87,13 +88,15 @@ export function hiddenStickers(scene) {
     if (store.has("stickers", sticker.id)) continue;
     const image = drawing(scene, stickerTexture(scene, sticker.art), sticker.x, sticker.y, sticker.width, 8);
     // A generous target without a visible badge that gives away the hiding place.
-    const target = scene.add.zone(
-      sticker.x,
-      sticker.y - image.displayHeight / 2,
-      Math.max(70, image.displayWidth),
-      Math.max(70, image.displayHeight),
-    )
-      .setDepth(9).setInteractive({ useHandCursor: true });
+    const target = scene.add
+      .zone(
+        sticker.x,
+        sticker.y - image.displayHeight / 2,
+        Math.max(70, image.displayWidth),
+        Math.max(70, image.displayHeight),
+      )
+      .setDepth(9)
+      .setInteractive({ useHandCursor: true });
     target.on("pointerdown", (_p, _x, _y, event) => {
       event.stopPropagation();
       if (scene.blocked || store.has("stickers", sticker.id)) return;

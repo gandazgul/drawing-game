@@ -1,4 +1,4 @@
-import { store } from "@caper/engine";
+import { store } from "@gandazgul/caper-engine";
 import { PuzzleScene } from "./PuzzleScene.js";
 import { drawPipe } from "../PipeView.js";
 import { restoreWaterway, rotatePipe, waterCells, waterConnected } from "../puzzles/waterway.js";
@@ -29,10 +29,11 @@ const allowed = (scene) => {
   return false;
 };
 function paperChrome(scene) {
-  scene.add.rectangle(600, 63, 1200, 135, 0xfff9e9, .96).setDepth(20);
-  scene.children.list.filter((child) => child.type === "Text" && child.y < 135)
+  scene.add.rectangle(600, 63, 1200, 135, 0xfff9e9, 0.96).setDepth(20);
+  scene.children.list
+    .filter((child) => child.type === "Text" && child.y < 135)
     .forEach((child) => child.setDepth(21));
-  scene.add.rectangle(600, 752, 1200, 96, 0xfff9e9, .96).setDepth(20);
+  scene.add.rectangle(600, 752, 1200, 96, 0xfff9e9, 0.96).setDepth(20);
   scene.feedback.setDepth(24).setStyle({ backgroundColor: "#fff9e9", padding: { x: 12, y: 6 } });
 }
 
@@ -56,10 +57,11 @@ export class TreePipes extends PuzzleScene {
     this.scheduled = false;
     drawing(this, "axolotlPink", 1040, 365, 180);
     drawing(this, "seaCreature", 1030, 550, 130);
-    this.add.text(176, 165, "Spring", font).setOrigin(.5);
-    this.add.text(870, 615, "Our pool", font).setOrigin(.5);
+    this.add.text(176, 165, "Spring", font).setOrigin(0.5);
+    this.add.text(870, 615, "Our pool", font).setOrigin(0.5);
     this.tiles = this.puzzle.cells.map((_c, i) => {
-      const x = 300 + i % 5 * 100, y = 148 + Math.floor(i / 5) * 100;
+      const x = 300 + (i % 5) * 100,
+        y = 148 + Math.floor(i / 5) * 100;
       const tile = this.add.rectangle(x + 50, y + 50, 96, 96, 0xe4ede5).setStrokeStyle(2, 0x97aaa1);
       const g = this.add.graphics().setDepth(1);
       if (i) {
@@ -79,7 +81,7 @@ export class TreePipes extends PuzzleScene {
     this.puzzle.solved = waterConnected(this.puzzle.cells);
     store.set("endingPipes", structuredClone(this.puzzle));
     this.tiles.forEach(({ g, x, y }, i) =>
-      drawPipe(g.clear(), x, y, this.puzzle.cells[i], wet.has(i), i === 0, i === 24)
+      drawPipe(g.clear(), x, y, this.puzzle.cells[i], wet.has(i), i === 0, i === 24),
     );
     this.feedback.setText(
       this.puzzle.solved ? "Water for all our swimming friends!" : `${wet.size} of 25 pipes reach the spring`,
@@ -121,7 +123,8 @@ export class TreeAssembly extends PuzzleScene {
       ? this.textures.get("endingHouseParts")
       : this.textures.addImage("endingHouseParts", source);
     this.pieces = PICTURE_PARTS.map((p) => {
-      const s = p.source, frame = `part-${p.id}`;
+      const s = p.source,
+        frame = `part-${p.id}`;
       if (!texture.has(frame)) {
         texture.add(
           frame,
@@ -133,12 +136,13 @@ export class TreeAssembly extends PuzzleScene {
         );
       }
       this.add.rectangle(p.x, p.y, p.w, p.h, 0xfff9e9).setStrokeStyle(2, 0x66418d);
-      this.add.image(p.x, p.y, "endingHouseParts", frame).setDisplaySize(p.w, p.h).setAlpha(.24);
-      const fitted = this.placed.has(p.id), at = fitted ? p : p.home;
-      const image = this.add.image(at.x, at.y, "endingHouseParts", frame).setDisplaySize(
-        p.w * (fitted ? 1 : .7),
-        p.h * (fitted ? 1 : .7),
-      ).setDepth(3);
+      this.add.image(p.x, p.y, "endingHouseParts", frame).setDisplaySize(p.w, p.h).setAlpha(0.24);
+      const fitted = this.placed.has(p.id),
+        at = fitted ? p : p.home;
+      const image = this.add
+        .image(at.x, at.y, "endingHouseParts", frame)
+        .setDisplaySize(p.w * (fitted ? 1 : 0.7), p.h * (fitted ? 1 : 0.7))
+        .setDepth(3);
       return { ...p, image };
     });
     this.selection = this.add.graphics().setDepth(5);
@@ -179,11 +183,14 @@ export class TreeAssembly extends PuzzleScene {
     this.refresh();
   }
   home(p) {
-    p.image.setPosition(p.home.x, p.home.y).setDisplaySize(p.w * .7, p.h * .7);
+    p.image.setPosition(p.home.x, p.home.y).setDisplaySize(p.w * 0.7, p.h * 0.7);
   }
   highlight(p) {
     const b = p.image.getBounds();
-    this.selection.clear().lineStyle(5, 0x66418d).strokeRect(b.x - 3, b.y - 3, b.width + 6, b.height + 6);
+    this.selection
+      .clear()
+      .lineStyle(5, 0x66418d)
+      .strokeRect(b.x - 3, b.y - 3, b.width + 6, b.height + 6);
   }
   cancel() {
     if (this.drag) this.home(this.drag.piece);
@@ -208,7 +215,10 @@ export class TreeAssembly extends PuzzleScene {
     sparkleBurst(this, 600, 390, true);
     this.feedback.setText("Bounka is finishing the door!");
     const helper = drawing(this, "bounkaKind", 940, 628, 125, 8);
-    const door = this.add.ellipse(620, 465, 14, 22, 0xf9df70).setStrokeStyle(3, 0x26798c).setDepth(7)
+    const door = this.add
+      .ellipse(620, 465, 14, 22, 0xf9df70)
+      .setStrokeStyle(3, 0x26798c)
+      .setDepth(7)
       .setAlpha(0);
     this.tweens.add({
       targets: helper,
@@ -310,9 +320,12 @@ class TreeTrace extends PuzzleScene {
     line(this.ink, prev, point, point.c, 14);
   }
   paint() {
-    this.ink.clear().lineStyle(22, 0xfff9e9).strokePoints(this.path).lineStyle(3, 0x66418d).strokePoints(
-      this.path,
-    );
+    this.ink
+      .clear()
+      .lineStyle(22, 0xfff9e9)
+      .strokePoints(this.path)
+      .lineStyle(3, 0x66418d)
+      .strokePoints(this.path);
     for (const s of this.strokes) {
       s.forEach((p, i) => line(this.ink, s[i - 1] ?? p, p, COLORS.includes(p.c) ? p.c : COLORS[0], 14));
     }
@@ -343,20 +356,21 @@ class TreeTrace extends PuzzleScene {
     this.instructions.setText("Our doorway is ready. Our friends will be here.");
     this.feedback.setText("Made together. Kept forever.");
     this.portalLight = this.add.graphics().setDepth(11).fillStyle(0xfff9e9).fillPoints(HEART_ROUTE, true);
-    const heart = this.add.container(
-      600,
-      280,
-      amuletTextures(this).map((key) => this.add.image(0, 0, key).setScale(.19)),
-    ).setDepth(16);
+    const heart = this.add
+      .container(
+        600,
+        280,
+        amuletTextures(this).map((key) => this.add.image(0, 0, key).setScale(0.19)),
+      )
+      .setDepth(16);
     sparkleBurst(this, 600, 390, true);
     if (!this.registry.get("reducedMotion")) {
       this.tweens.add({ targets: heart, y: 260, duration: 900, ease: "Sine.inOut", yoyo: true });
     }
     this.button(650, 752, "Back to our friends", () => this.scene.start("TreeClearing"), "#f9df70");
     if (!store.get("endingPortalSeen")) {
-      this.time.delayedCall(
-        1000,
-        () => this.ui.dialogue(DIALOGUE.endingPortal, () => store.set("endingPortalSeen", true)),
+      this.time.delayedCall(1000, () =>
+        this.ui.dialogue(DIALOGUE.endingPortal, () => store.set("endingPortalSeen", true)),
       );
     }
   }
@@ -365,10 +379,14 @@ class TreeTrace extends PuzzleScene {
     this.dots = [];
     if (!this.tapMode || this.done) return;
     const indices = this.portal ? [0, 8, 16, 24, 32, 40, 48, 56, 64] : this.path.map((_p, i) => i);
-    const i = indices[this.tapIndex], p = this.path[i];
+    const i = indices[this.tapIndex],
+      p = this.path[i];
     const dot = this.add.circle(p.x, p.y, 27, 0xfddf55).setStrokeStyle(3, 0x66418d).setDepth(14);
     fingerCircle(this, dot, 48);
-    const label = this.add.text(p.x, p.y, String(this.tapIndex + 1), font).setOrigin(.5).setDepth(15);
+    const label = this.add
+      .text(p.x, p.y, String(this.tapIndex + 1), font)
+      .setOrigin(0.5)
+      .setDepth(15);
     dot.on("pointerdown", (_p, _x, _y, e) => {
       e.stopPropagation();
       if (this.blocked) return;
@@ -432,13 +450,16 @@ export class TreeDecorate extends PuzzleScene {
     this.preview = null;
     this.rendered = [];
     this.selection = this.add.graphics().setDepth(18);
-    this.add.rectangle(600, 180, 1120, 90, 0xfff9e9, .97).setDepth(10);
+    this.add.rectangle(600, 180, 1120, 90, 0xfff9e9, 0.97).setDepth(10);
     this.tray = Object.keys(DECORATIONS).map((kind, i) => {
-      const x = 150 + i * 180, y = 199;
+      const x = 150 + i * 180,
+        y = 199;
       const thumbnail = decoration(this, { kind, x, y }, 12).setName("decoration-thumbnail");
-      const fit = Math.min(.65, 62 / (thumbnail.displayHeight || 62));
+      const fit = Math.min(0.65, 62 / (thumbnail.displayHeight || 62));
       thumbnail.setScale(thumbnail.scaleX * fit, thumbnail.scaleY * fit);
-      this.add.text(x + 36, 182, DECORATIONS[kind].label, { ...font, fontSize: "21px" }).setOrigin(0, .5)
+      this.add
+        .text(x + 36, 182, DECORATIONS[kind].label, { ...font, fontSize: "21px" })
+        .setOrigin(0, 0.5)
         .setDepth(12);
       return { kind, x, y: 180 };
     });
@@ -461,7 +482,10 @@ export class TreeDecorate extends PuzzleScene {
     const slot = this.tray.find((s) => Math.abs(p.x - s.x - 40) < 85 && Math.abs(p.y - s.y) < 45);
     if (slot) {
       this.selected = slot.kind;
-      this.selection.clear().lineStyle(4, 0x66418d).strokeRoundedRect(slot.x - 40, 137, 160, 82, 8);
+      this.selection
+        .clear()
+        .lineStyle(4, 0x66418d)
+        .strokeRoundedRect(slot.x - 40, 137, 160, 82, 8);
       this.drag = { id: p.id, kind: slot.kind, index: -1, x: p.x, y: p.y, moved: false };
       return;
     }
@@ -470,8 +494,8 @@ export class TreeDecorate extends PuzzleScene {
       this.move(p);
       return;
     }
-    const index = this.pieces.findLastIndex((q) =>
-      Math.abs(q.x - p.x) < 45 && p.y > q.y - 95 && p.y < q.y + 20
+    const index = this.pieces.findLastIndex(
+      (q) => Math.abs(q.x - p.x) < 45 && p.y > q.y - 95 && p.y < q.y + 20,
     );
     if (index >= 0) {
       this.drag = { id: p.id, kind: this.pieces[index].kind, index, x: p.x, y: p.y, moved: false };
@@ -482,7 +506,7 @@ export class TreeDecorate extends PuzzleScene {
     if (!d || d.id !== p.id || this.blocked) return;
     if (Math.hypot(p.x - d.x, p.y - d.y) > 8) d.moved = true;
     if (!d.moved) return;
-    this.preview ??= decoration(this, { kind: d.kind, x: p.x, y: p.y }, 19).setAlpha(.8);
+    this.preview ??= decoration(this, { kind: d.kind, x: p.x, y: p.y }, 19).setAlpha(0.8);
     this.preview.setPosition(p.x, p.y);
   }
   end(p) {
@@ -514,7 +538,7 @@ export class TreeDecorate extends PuzzleScene {
   redraw() {
     this.rendered.forEach((s) => s.destroy());
     this.rendered = savedDecorations(this, this.pieces);
-    this.undo.setAlpha(this.history.length ? 1 : .45);
+    this.undo.setAlpha(this.history.length ? 1 : 0.45);
     this.feedback.setText(
       this.pieces.length >= 60
         ? "A full garden! Move a decoration or return one to the tray."

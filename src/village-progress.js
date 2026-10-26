@@ -59,7 +59,7 @@ export const TASKS = {
     kind: "slide",
   },
 };
-export const doneTasks = (raw) => Array.isArray(raw) ? [...new Set(raw.filter((id) => TASKS[id]))] : [];
+export const doneTasks = (raw) => (Array.isArray(raw) ? [...new Set(raw.filter((id) => TASKS[id]))] : []);
 export const branchDone = (raw, branch) => BRANCHES[branch].tasks.every((id) => doneTasks(raw).includes(id));
 export const villageDone = (raw) => Object.keys(BRANCHES).every((id) => branchDone(raw, id));
 export const nextTask = (raw, branch) => BRANCHES[branch].tasks.find((id) => !doneTasks(raw).includes(id));
@@ -73,7 +73,7 @@ export function finishTask(raw, id) {
   return TASKS[id] && taskAvailable(done, id) ? [...new Set([...done, id])] : done;
 }
 export const adjacent = (a, b, cols) =>
-  Math.abs(a % cols - b % cols) + Math.abs(Math.floor(a / cols) - Math.floor(b / cols)) === 1;
+  Math.abs((a % cols) - (b % cols)) + Math.abs(Math.floor(a / cols) - Math.floor(b / cols)) === 1;
 export function slide(board, index, cols = 3) {
   const empty = board.indexOf(0);
   if (!adjacent(index, empty, cols)) return board;

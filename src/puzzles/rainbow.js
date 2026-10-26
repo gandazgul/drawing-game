@@ -13,13 +13,15 @@ export const BRIDGE = Array.from({ length: 25 }, (_, i) => {
 
 // Direct scan coordinates; world and puzzle share the same source silhouette.
 export const BRIDGE_CROP = { x: 0, y: 0, width: 1310, height: 780 };
-export const BRIDGE_VIEW = { x: 240, y: 140, scale: .55 };
+export const BRIDGE_VIEW = { x: 240, y: 140, scale: 0.55 };
 export const COLOR_NAMES = ["Red", "Orange", "Yellow", "Green", "Blue", "Pink", "Purple"];
 export function bridgePoint(p, world = false) {
-  return world ? { x: 240 + p.x * .55, y: 85 + p.y * .55 } : {
-    x: BRIDGE_VIEW.x + (p.x - BRIDGE_CROP.x) * BRIDGE_VIEW.scale,
-    y: BRIDGE_VIEW.y + (p.y - BRIDGE_CROP.y) * BRIDGE_VIEW.scale,
-  };
+  return world
+    ? { x: 240 + p.x * 0.55, y: 85 + p.y * 0.55 }
+    : {
+        x: BRIDGE_VIEW.x + (p.x - BRIDGE_CROP.x) * BRIDGE_VIEW.scale,
+        y: BRIDGE_VIEW.y + (p.y - BRIDGE_CROP.y) * BRIDGE_VIEW.scale,
+      };
 }
 export function bridgeSource(p) {
   return {
@@ -42,7 +44,7 @@ export const BRIDGE_PATHS = [
       x: left + (right - left) * t,
       y: ly * (1 - t) + ry * t - (ly - top) * Math.sin(Math.PI * t),
     });
-  })
+  }),
 );
 // Reproject existing marks when replacing the former generated arch. Keep the
 // player's strokes, including partial work and wobble, rather than clearing them.
@@ -69,26 +71,26 @@ export function migrateBridgeBands(raw, version) {
           a = BRIDGE_PATHS[i][Math.floor(index)],
           b = BRIDGE_PATHS[i][Math.min(24, Math.ceil(index))];
         const f = index - Math.floor(index);
-        return { x: a.x + (b.x - a.x) * f, y: a.y + (b.y - a.y) * f + (p.y - oy) * .55 };
-      })
-    )
+        return { x: a.x + (b.x - a.x) * f, y: a.y + (b.y - a.y) * f + (p.y - oy) * 0.55 };
+      }),
+    ),
   );
 }
 export const safeBridgeBands = (raw) => RAINBOW.map((_, i) => validStrokes(raw?.[i]));
 export function bridgeBandCoverage(i, strokes = []) {
   const coverage = new Coverage(traceSamples(BRIDGE_PATHS[i]), 10, {
     endRadius: 7,
-    requiredRatio: .92,
+    requiredRatio: 0.92,
   }).restore(strokes);
   const complete = coverage.complete.bind(coverage);
   coverage.complete = (options) =>
-    complete(options) && coverage.hit.has(0) &&
-    coverage.hit.has(coverage.samples.length - 1);
+    complete(options) && coverage.hit.has(0) && coverage.hit.has(coverage.samples.length - 1);
   return coverage;
 }
 export const bridgeBandAccepts = (i, p) =>
   BRIDGE_PATHS[i].slice(1).some((b, n) => distanceToSegment(p, BRIDGE_PATHS[i][n], b) <= 14);
 export function bridgeBandsReady(bands, strokeActive = false) {
-  return !strokeActive &&
-    safeBridgeBands(bands).every((strokes, i) => bridgeBandCoverage(i, strokes).complete());
+  return (
+    !strokeActive && safeBridgeBands(bands).every((strokes, i) => bridgeBandCoverage(i, strokes).complete())
+  );
 }

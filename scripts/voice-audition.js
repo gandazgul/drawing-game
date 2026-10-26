@@ -1,3 +1,6 @@
+import { execFile } from "node:child_process";
+import { promisify } from "node:util";
+import { writeFile, mkdir, stat, readFile } from "node:fs/promises";
 import { speechFingerprint, speechRequest, VOICE_AUDITIONS } from "../src/voices.js";
 
 const endpoint = "https://texttospeech.googleapis.com/v1/text:synthesize";
@@ -24,39 +27,40 @@ export function parseOptions(args) {
 }
 
 export async function accessToken(auth) {
-  const result = await new Deno.Command("gcloud", {
-    args: auth === "adc"
+  const args =
+    auth === "adc"
       ? ["auth", "application-default", "print-access-token", "--quiet"]
-      : ["auth", "print-access-token", "--quiet"],
-    stdin: "null",
-    stdout: "piped",
-    stderr: "piped",
-  }).output();
-  const token = new TextDecoder().decode(result.stdout).trim();
-  if (!result.success || !token) {
-    throw new Error(
-      `Google ${auth} credentials unavailable. Sign in locally with gcloud before generating audio.`,
-    );
+      : ["auth", "print-access-token", "--quiet"];
+  try {
+    const { stdout } = await promisify(execFile)("gcloud", args, { timeout: 30000 });
+    const token = stdout.trim();
+    if (token) return token;
+  } catch {
+    // Never expose subprocess output: it may contain credentials.
   }
-  return token;
+  throw new Error(
+    `Google ${auth} credentials unavailable. Sign in locally with gcloud before generating audio.`,
+  );
 }
 
 async function exists(path) {
   try {
-    return (await Deno.stat(path)).isFile;
+    return (await stat(path)).isFile();
   } catch (error) {
-    if (error instanceof Deno.errors.NotFound) return false;
+    if (error.code === "ENOENT") return false;
     throw error;
   }
 }
 
 async function main() {
-  const options = parseOptions(Deno.args);
-  const jobs = await Promise.all(VOICE_AUDITIONS.map(async (line) => {
-    const request = speechRequest(line.speaker, line.text);
-    const fingerprint = await speechFingerprint(request);
-    return { ...line, request, fingerprint, file: `${line.id}-${fingerprint.slice(0, 16)}.mp3` };
-  }));
+  const options = parseOptions(process.argv.slice(2));
+  const jobs = await Promise.all(
+    VOICE_AUDITIONS.map(async (line) => {
+      const request = speechRequest(line.speaker, line.text);
+      const fingerprint = await speechFingerprint(request);
+      return { ...line, request, fingerprint, file: `${line.id}-${fingerprint.slice(0, 16)}.mp3` };
+    }),
+  );
   console.log(
     options.generate
       ? `Paid audition: project ${options.project}`
@@ -64,21 +68,19 @@ async function main() {
   );
   for (const job of jobs) console.log(`${job.speaker} / ${job.request.voice.name}: ${job.text}`);
   if (!options.generate) {
-    console.log(
-      "To generate these THREE samples: deno task voices:audition --generate --project YOUR_PROJECT_ID",
-    );
+    console.log("To generate these THREE samples: pnpm voices:audition --generate --project YOUR_PROJECT_ID");
     return;
   }
   // Exactly three short samples at most; no automatic retries or model/voice fallback.
   // A timed-out request may still be billed by Google. Do not retry blindly.
-  await Deno.mkdir(output, { recursive: true });
+  await mkdir(output, { recursive: true });
   let token;
   for (const job of jobs) {
     const audioPath = new URL(job.file, output);
     const metadataPath = new URL(`${job.file}.json`, output);
     if (await exists(audioPath)) {
-      const metadata = JSON.parse(await Deno.readTextFile(metadataPath));
-      if (metadata.fingerprint !== job.fingerprint || (await Deno.stat(audioPath)).size < 32) {
+      const metadata = JSON.parse(await readFile(metadataPath, "utf8"));
+      if (metadata.fingerprint !== job.fingerprint || (await stat(audioPath)).size < 32) {
         throw new Error(`Inspect incomplete cached audio: ${audioPath.pathname}`);
       }
       console.log(`Cached: ${audioPath.pathname}`);
@@ -110,8 +112,8 @@ async function main() {
     const mp3 = bytes[0] === 0xff && (bytes[1] & 0xe0) === 0xe0;
     const id3 = bytes[0] === 0x49 && bytes[1] === 0x44 && bytes[2] === 0x33;
     if (bytes.length < 32 || !(mp3 || id3)) throw new Error("Response is not recognizable MP3 audio.");
-    await Deno.writeFile(audioPath, bytes, { createNew: true });
-    await Deno.writeTextFile(
+    await writeFile(audioPath, bytes, { flag: "wx" });
+    await writeFile(
       metadataPath,
       JSON.stringify(
         {
@@ -125,7 +127,7 @@ async function main() {
         null,
         2,
       ) + "\n",
-      { createNew: true },
+      { flag: "wx" },
     );
     console.log(`Saved AI-generated voice audition: ${audioPath.pathname}`);
   }
@@ -137,6 +139,6 @@ if (import.meta.main) {
   } catch (error) {
     // Fixed messages from this script are safe; never dump subprocess output.
     console.error(error instanceof Error ? error.message : "Voice audition failed.");
-    Deno.exitCode = 1;
+    process.exitCode = 1;
   }
 }

@@ -1,4 +1,4 @@
-import { store } from "@caper/engine";
+import { store } from "@gandazgul/caper-engine";
 import { PuzzleScene } from "./PuzzleScene.js";
 import { font, INK, line } from "../art.js";
 import { drawingInterruptions, fingerCircle, traceTouch, worldPerPixel } from "../touch-input.js";
@@ -28,7 +28,10 @@ export class BridgeDraw extends PuzzleScene {
     this.bands = migrateBridgeBands(store.get("bridgeBands"), store.get("bridgeArtVersion"));
     store.set("bridgeArtVersion", 2);
     this.coverage = this.bands.map((strokes, i) => bridgeBandCoverage(i, strokes));
-    this.selected = Math.max(0, this.coverage.findIndex((c) => !c.complete()));
+    this.selected = Math.max(
+      0,
+      this.coverage.findIndex((c) => !c.complete()),
+    );
     this.current = null;
     this.pointerId = null;
     this.done = false;
@@ -40,11 +43,14 @@ export class BridgeDraw extends PuzzleScene {
     this.chips = RAINBOW.map((color, i) => {
       const x = 300 + i * 100;
       const chip = fingerCircle(this, this.add.circle(x, 614, 31, color).setDepth(5));
-      const label = this.add.text(x, 614, String(i + 1), {
-        ...font,
-        fontSize: "24px",
-        backgroundColor: "#fff9e9",
-      }).setOrigin(.5).setDepth(6);
+      const label = this.add
+        .text(x, 614, String(i + 1), {
+          ...font,
+          fontSize: "24px",
+          backgroundColor: "#fff9e9",
+        })
+        .setOrigin(0.5)
+        .setDepth(6);
       chip.on("pointerdown", (_p, _x, _y, event) => {
         event.stopPropagation();
         if (this.blocked) return;
@@ -154,8 +160,8 @@ export class BridgeDraw extends PuzzleScene {
   refresh() {
     this.guides.clear();
     const path = BRIDGE_PATHS[this.selected];
-    this.guides.lineStyle(20, 0xfff9e9, .7).strokePoints(path);
-    this.guides.lineStyle(2, RAINBOW[this.selected], .8).strokePoints(path);
+    this.guides.lineStyle(20, 0xfff9e9, 0.7).strokePoints(path);
+    this.guides.lineStyle(2, RAINBOW[this.selected], 0.8).strokePoints(path);
     [path[0], path.at(-1)].forEach((p) => {
       this.guides.fillStyle(0xfff9e9).fillCircle(p.x, p.y, 12);
       this.guides.lineStyle(3, RAINBOW[this.selected]).strokeCircle(p.x, p.y, 12);
@@ -171,13 +177,16 @@ export class BridgeDraw extends PuzzleScene {
       this.dots = [0, 6, 12, 18, 24].map((n, i) => {
         const p = path[n];
         const next = i === this.tapIndex;
-        const dot = this.add.circle(p.x, p.y, next ? 23 : 17, next ? 0xfddf55 : 0xfff9e9)
-          .setStrokeStyle(3, RAINBOW[this.selected]).setDepth(10);
+        const dot = this.add
+          .circle(p.x, p.y, next ? 23 : 17, next ? 0xfddf55 : 0xfff9e9)
+          .setStrokeStyle(3, RAINBOW[this.selected])
+          .setDepth(10);
         // Neighboring dots are closer than a fingertip on phones. Only the
         // next dot owns a hit area, so enlarged targets cannot steal its tap.
         if (next) fingerCircle(this, dot, 48);
-        const text = this.add.text(p.x, p.y, String(i + 1), { ...font, fontSize: next ? "29px" : "23px" })
-          .setOrigin(.5)
+        const text = this.add
+          .text(p.x, p.y, String(i + 1), { ...font, fontSize: next ? "29px" : "23px" })
+          .setOrigin(0.5)
           .setDepth(11);
         dot.on("pointerdown", (_p, _x, _y, e) => {
           e.stopPropagation();

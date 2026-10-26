@@ -1,4 +1,4 @@
-import { store } from "@caper/engine";
+import { store } from "@gandazgul/caper-engine";
 import Phaser from "phaser";
 import { PuzzleScene } from "./PuzzleScene.js";
 import { font } from "../art.js";
@@ -23,8 +23,8 @@ import { DIALOGUE } from "../dialogue.js";
 
 function backdrop(scene) {
   scene.add.image(600, 400, "frozenPond").setDisplaySize(1200, 800).setDepth(-3);
-  scene.add.rectangle(600, 68, 1200, 136, 0xfff9e9, .96).setDepth(-2);
-  scene.add.rectangle(600, 725, 1200, 150, 0xfff9e9, .96).setDepth(-2);
+  scene.add.rectangle(600, 68, 1200, 136, 0xfff9e9, 0.96).setDepth(-2);
+  scene.add.rectangle(600, 725, 1200, 150, 0xfff9e9, 0.96).setDepth(-2);
 }
 
 function sayHelp(scene, line) {
@@ -52,20 +52,26 @@ export class PenguinSlide extends PuzzleScene {
     this.replay = snowUnlocked(savedMaterials, store.get("snowBuilderUnlocked"));
     // Replays collect a fresh set for this visit without changing the permanent supplies.
     this.found = this.replay ? [] : savedMaterials;
-    this.add.graphics().lineStyle(5, 0x497e91, .6).lineBetween(175, 462, 1030, 462);
-    this.targetRing = this.add.ellipse(600, 462, 200, 65, 0xe3f4ac, .65).setStrokeStyle(4, 0x386a40);
-    this.penguin = this.add.image(180, 455, "penguin").setOrigin(.5, 1).setDisplaySize(110, 165);
+    this.add.graphics().lineStyle(5, 0x497e91, 0.6).lineBetween(175, 462, 1030, 462);
+    this.targetRing = this.add.ellipse(600, 462, 200, 65, 0xe3f4ac, 0.65).setStrokeStyle(4, 0x386a40);
+    this.penguin = this.add.image(180, 455, "penguin").setOrigin(0.5, 1).setDisplaySize(110, 165);
     this.material = snowPart(this, "twig", 600, 430, 80);
     this.feedback.setY(529).setBackgroundColor("#fff9e9").setPadding(12, 6);
-    this.holdButton = this.add.circle(600, 642, 82, 0x66418d).setStrokeStyle(5, 0xfff9e9)
-      .setDepth(25).setInteractive(new Phaser.Geom.Circle(82, 82, 82), Phaser.Geom.Circle.Contains);
+    this.holdButton = this.add
+      .circle(600, 642, 82, 0x66418d)
+      .setStrokeStyle(5, 0xfff9e9)
+      .setDepth(25)
+      .setInteractive(new Phaser.Geom.Circle(82, 82, 82), Phaser.Geom.Circle.Contains);
     this.holdButton.input.cursor = "pointer";
-    this.holdLabel = this.add.text(600, 642, "Hold to\nslide", {
-      ...font,
-      color: "#fff9e9",
-      fontSize: "30px",
-      align: "center",
-    }).setOrigin(.5).setDepth(26);
+    this.holdLabel = this.add
+      .text(600, 642, "Hold to\nslide", {
+        ...font,
+        color: "#fff9e9",
+        fontSize: "30px",
+        align: "center",
+      })
+      .setOrigin(0.5)
+      .setDepth(26);
     this.holdButton.on("pointerdown", (p, _x, _y, e) => {
       e.stopPropagation();
       this.holdPointer = p.id;
@@ -108,14 +114,14 @@ export class PenguinSlide extends PuzzleScene {
     });
     drawingInterruptions(this, () => this.cancelHold());
     this.collectedIcons = MATERIALS.map((id, i) =>
-      snowPart(this, materialPart[id], 500 + i * 100, 190, id === "rocks" ? 30 : 65)
+      snowPart(this, materialPart[id], 500 + i * 100, 190, id === "rocks" ? 30 : 65),
     );
     this.round();
     sayHelp(this, DIALOGUE.snowSlideHelp[0]);
   }
   round() {
     this.currentMaterial = nextMaterial(this.found);
-    this.collectedIcons.forEach((icon, i) => icon.setAlpha(this.found.includes(MATERIALS[i]) ? 1 : .25));
+    this.collectedIcons.forEach((icon, i) => icon.setAlpha(this.found.includes(MATERIALS[i]) ? 1 : 0.25));
     this.penguin.setPosition(180, 455).setAngle(0);
     if (!this.currentMaterial) {
       if (!this.replay) store.set("snowBuilderUnlocked", true);
@@ -147,13 +153,17 @@ export class PenguinSlide extends PuzzleScene {
   }
   refreshButton() {
     if (!this.currentMaterial) return;
-    this.holdButton.setFillStyle(this.holding ? 0x49784f : 0x66418d).setAlpha(this.sliding ? .65 : 1);
+    this.holdButton.setFillStyle(this.holding ? 0x49784f : 0x66418d).setAlpha(this.sliding ? 0.65 : 1);
     this.holdLabel.setText(
       this.sliding
         ? "Stopped!"
         : this.holding
-        ? (this.tapMode ? "Tap to\nstop!" : "Let go!")
-        : (this.tapMode ? "Tap to\nstart" : "Hold to\nslide"),
+          ? this.tapMode
+            ? "Tap to\nstop!"
+            : "Let go!"
+          : this.tapMode
+            ? "Tap to\nstart"
+            : "Hold to\nslide",
     );
   }
   press() {
@@ -181,7 +191,10 @@ export class PenguinSlide extends PuzzleScene {
   setBlocked(value) {
     if (value) this.cancelHold();
     super.setBlocked(value);
-    if (this.tweens) value ? this.tweens.pauseAll() : this.tweens.resumeAll();
+    if (this.tweens) {
+      if (value) this.tweens.pauseAll();
+      else this.tweens.resumeAll();
+    }
   }
   release() {
     if (!this.holding || this.blocked || this.sliding) return;
@@ -207,7 +220,7 @@ export class PenguinSlide extends PuzzleScene {
             });
           }
           this.feedback.setText("Got them! Back to our snow pile.");
-          if (this.ui.effectsOn) this.sound.play("bubblePop", { volume: .3 });
+          if (this.ui.effectsOn) this.sound.play("bubblePop", { volume: 0.3 });
         } else this.feedback.setText("Another slide! Let go in the green patch.");
         this.time.delayedCall(800, () => {
           this.sliding = false;
@@ -222,7 +235,7 @@ export class PenguinSlide extends PuzzleScene {
     this.elapsed += Math.min(delta, 60);
     const power = slidePower(this.elapsed);
     this.penguin.x = 180 + 840 * power;
-    this.penguin.angle = this.registry.get("reducedMotion") ? 0 : (this.elapsed % 3400 < 1700 ? 12 : -12);
+    this.penguin.angle = this.registry.get("reducedMotion") ? 0 : this.elapsed % 3400 < 1700 ? 12 : -12;
   }
   hint() {
     this.ui.status(this.instructions.text);
@@ -251,19 +264,21 @@ export class SnowmanBuilder extends PuzzleScene {
     this.drag = null;
     this.preview = null;
     this.rendered = [];
-    this.add.rectangle(1010, 392, 330, 506, 0xfff9e9, .97);
-    this.add.ellipse(490, 622, 490, 46, 0x83a9c1, .16);
+    this.add.rectangle(1010, 392, 330, 506, 0xfff9e9, 0.97);
+    this.add.ellipse(490, 622, 490, 46, 0x83a9c1, 0.16);
     this.guides = BODY_PARTS.map((kind) => {
       const part = SNOW_PARTS[kind];
-      return snowPart(this, kind, part.x, part.y).setAlpha(.17);
+      return snowPart(this, kind, part.x, part.y).setAlpha(0.17);
     });
     this.tray = Object.keys(SNOW_PARTS).map((kind, i) => {
-      const x = 930 + i % 2 * 158, y = 205 + Math.floor(i / 2) * 119;
+      const x = 930 + (i % 2) * 158,
+        y = 205 + Math.floor(i / 2) * 119;
       const icon = snowPart(this, kind, x, y, kind === "rock" ? 38 : 88).setDepth(12);
       if (icon.displayHeight > 75) icon.setScale(75 / icon.height);
-      this.add.text(x, y + 43, SNOW_PARTS[kind].label, { ...font, fontSize: "22px" }).setOrigin(.5).setDepth(
-        12,
-      );
+      this.add
+        .text(x, y + 43, SNOW_PARTS[kind].label, { ...font, fontSize: "22px" })
+        .setOrigin(0.5)
+        .setDepth(12);
       return { kind, x, y, icon };
     });
     this.selection = this.add.graphics().setDepth(11);
@@ -292,7 +307,10 @@ export class SnowmanBuilder extends PuzzleScene {
       const slot = this.tray.find((s) => Math.abs(p.x - s.x) < 76 && Math.abs(p.y - s.y) < 58);
       if (!slot) return;
       this.selected = slot.kind;
-      this.selection.clear().lineStyle(4, 0xe6ad24).strokeRoundedRect(slot.x - 64, slot.y - 53, 128, 105, 8);
+      this.selection
+        .clear()
+        .lineStyle(4, 0xe6ad24)
+        .strokeRoundedRect(slot.x - 64, slot.y - 53, 128, 105, 8);
       this.drag = { id: p.id, kind: slot.kind, index: -1, x: p.x, y: p.y, moved: false, fromTray: true };
       return;
     }
@@ -304,8 +322,12 @@ export class SnowmanBuilder extends PuzzleScene {
     const radius = Math.max(22, 20 * worldPerPixel(this));
     const item = [...this.rendered].reverse().find(({ sprite }) => {
       const bounds = sprite.getBounds();
-      return p.x >= bounds.x - radius && p.x <= bounds.right + radius &&
-        p.y >= bounds.y - radius && p.y <= bounds.bottom + radius;
+      return (
+        p.x >= bounds.x - radius &&
+        p.x <= bounds.right + radius &&
+        p.y >= bounds.y - radius &&
+        p.y <= bounds.bottom + radius
+      );
     });
     if (item) {
       this.drag = {
@@ -323,7 +345,7 @@ export class SnowmanBuilder extends PuzzleScene {
     if (!d || d.id !== p.id || this.blocked) return;
     if (Math.hypot(p.x - d.x, p.y - d.y) > 8) d.moved = true;
     if (!d.moved) return;
-    this.preview ??= snowPart(this, d.kind, p.x, p.y).setAlpha(.85).setDepth(20);
+    this.preview ??= snowPart(this, d.kind, p.x, p.y).setAlpha(0.85).setDepth(20);
     this.preview.setPosition(p.x, p.y).setFlipX(d.kind === "twig" && p.x > 490);
   }
   end(p) {
@@ -361,20 +383,22 @@ export class SnowmanBuilder extends PuzzleScene {
   }
   redraw() {
     this.rendered.forEach(({ sprite }) => sprite.destroy());
-    this.rendered = this.pieces.map((p, index) => ({
-      index,
-      sprite: snowPart(this, p.kind, p.x, p.y).setFlipX(p.flip).setDepth(SNOW_PARTS[p.kind].depth),
-    })).sort((a, b) => a.sprite.depth - b.sprite.depth);
+    this.rendered = this.pieces
+      .map((p, index) => ({
+        index,
+        sprite: snowPart(this, p.kind, p.x, p.y).setFlipX(p.flip).setDepth(SNOW_PARTS[p.kind].depth),
+      }))
+      .sort((a, b) => a.sprite.depth - b.sprite.depth);
     this.guides.forEach((g, i) => g.setVisible(!this.pieces.some((p) => p.kind === BODY_PARTS[i])));
     const ready = snowmanReady(this.pieces);
     this.done.setText(ready ? "See our snow friend →" : "Add the three snowballs");
-    this.done.setStyle({ backgroundColor: ready ? "#f9df70" : "#e4eaf0" }).setAlpha(ready ? 1 : .65);
+    this.done.setStyle({ backgroundColor: ready ? "#f9df70" : "#e4eaf0" }).setAlpha(ready ? 1 : 0.65);
     this.feedback.setText(
       ready
         ? "Ready whenever you are. You can keep decorating!"
         : "The pale shapes show where the snowballs go.",
     );
-    this.undoButton.setAlpha(this.history.length ? 1 : .45);
+    this.undoButton.setAlpha(this.history.length ? 1 : 0.45);
   }
   leave() {
     this.cancelDrag();

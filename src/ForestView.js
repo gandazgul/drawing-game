@@ -26,7 +26,7 @@ export function createBear(scene, x, y, height = 240) {
       frameHeight: 512,
     });
   }
-  const sprite = scene.add.sprite(x, y, "bearPoses", 0).setOrigin(.5, 1).setDepth(5);
+  const sprite = scene.add.sprite(x, y, "bearPoses", 0).setOrigin(0.5, 1).setDepth(5);
   sprite.setScale(height / 512);
   return trackArt(scene, "ballerina-bear", sprite);
 }

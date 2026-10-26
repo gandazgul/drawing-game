@@ -1,4 +1,4 @@
-import { store } from "@caper/engine";
+import { store } from "@gandazgul/caper-engine";
 import { WorldScene } from "./WorldScene.js";
 import { font, line } from "../art.js";
 import { DIALOGUE } from "../dialogue.js";
@@ -25,7 +25,7 @@ export class StudioDark extends WorldScene {
       backgroundsByChapter: { paint: "studioDark" },
       walkable: studioWalkable(false, false),
       // The cutaway is zoomed out, but both girls still fit the upstairs doorway.
-      characterScales: { keila: .14, olivia: .145 },
+      characterScales: { keila: 0.14, olivia: 0.145 },
       companionSpacing: 80,
       activeCharacter: { startPosition: { x: 210, y: 700 } },
       props: [],
@@ -37,9 +37,8 @@ export class StudioDark extends WorldScene {
     this.gapDone = this.stairsDone && store.get("studioGapDone") === true;
     this.layoutVariant = `stairs-${this.stairsDone}-gap-${this.gapDone}`;
     this.sceneConfig.walkable = studioWalkable(this.stairsDone, this.gapDone);
-    this.sceneConfig.activeCharacter.startPosition = data.fromWorkroom && this.gapDone
-      ? { x: 180, y: 310 }
-      : { x: 210, y: 700 };
+    this.sceneConfig.activeCharacter.startPosition =
+      data.fromWorkroom && this.gapDone ? { x: 180, y: 310 } : { x: 210, y: 700 };
     this.stroke = null;
     this.pointerId = null;
     this.fogTexture = null;
@@ -50,8 +49,8 @@ export class StudioDark extends WorldScene {
     workshopWallArt(this);
     this.rubs = validRub(store.get("studioDarkErased"));
     // Existing repaired rooms remain revealed when loading older saves.
-    this.darkCleared = store.get("studioDarkCleared") === true || this.stairsDone ||
-      darknessCleared(this.rubs);
+    this.darkCleared =
+      store.get("studioDarkCleared") === true || this.stairsDone || darknessCleared(this.rubs);
     if (this.darkCleared) store.set("studioDarkCleared", true);
     this.rubKeys = new Set(this.rubs.map((p) => `${p.x},${p.y}`));
     this.stairStrokes = validStrokes(store.get("studioStairStrokes"));
@@ -59,12 +58,15 @@ export class StudioDark extends WorldScene {
     this.ink = this.add.graphics().setDepth(4);
     this.drawPaths();
     this.makeFog();
-    this.note = this.add.text(600, 38, "", {
-      ...font,
-      fontSize: "25px",
-      backgroundColor: "#fff9e9",
-      padding: { x: 14, y: 10 },
-    }).setOrigin(.5).setDepth(81);
+    this.note = this.add
+      .text(600, 38, "", {
+        ...font,
+        fontSize: "25px",
+        backgroundColor: "#fff9e9",
+        padding: { x: 14, y: 10 },
+      })
+      .setOrigin(0.5)
+      .setDepth(81);
     const back = () => this.go("StudioGallery", { x: 125, y: 700 });
     const next = () => {
       if (!this.gapDone) return this.hint();
@@ -109,12 +111,12 @@ export class StudioDark extends WorldScene {
       mode === "erase"
         ? "Rub the darkness to find our drawings and the missing path."
         : mode === "draw"
-        ? "Trace the pale line. Tap away from it to walk."
-        : this.gapDone
-        ? "Walk across your bridge to the purple door."
-        : this.stairsDone
-        ? "Walk upstairs, then tap the pale gap to draw a bridge."
-        : "Tap the pale steps to draw them. Tap the floor to walk.",
+          ? "Trace the pale line. Tap away from it to walk."
+          : this.gapDone
+            ? "Walk across your bridge to the purple door."
+            : this.stairsDone
+              ? "Walk upstairs, then tap the pale gap to draw a bridge."
+              : "Tap the pale steps to draw them. Tap the floor to walk.",
     );
     this.ui.status(this.note.text);
   }
@@ -165,11 +167,12 @@ export class StudioDark extends WorldScene {
       return;
     }
     if (this.mode === "erase") {
-      const a = this.previous ?? p, n = Math.max(1, Math.ceil(Math.hypot(p.x - a.x, p.y - a.y) / 22));
+      const a = this.previous ?? p,
+        n = Math.max(1, Math.ceil(Math.hypot(p.x - a.x, p.y - a.y) / 22));
       for (let i = 0; i <= n; i++) {
         const q = {
-          x: Math.round((a.x + (p.x - a.x) * i / n) / 10) * 10,
-          y: Math.round((a.y + (p.y - a.y) * i / n) / 10) * 10,
+          x: Math.round((a.x + ((p.x - a.x) * i) / n) / 10) * 10,
+          y: Math.round((a.y + ((p.y - a.y) * i) / n) / 10) * 10,
         };
         const key = `${q.x},${q.y}`;
         if (!this.rubKeys.has(key) && this.rubs.length < 6000) {
@@ -236,16 +239,18 @@ export class StudioDark extends WorldScene {
   }
   drawPaths() {
     this.ink.clear();
-    [[STUDIO_STAIRS, this.stairsDone, this.stairStrokes], [STUDIO_GAP, this.gapDone, this.gapStrokes]]
-      .forEach(([path, done, strokes]) => {
-        for (let i = 1; i < path.length; i++) {
-          line(this.ink, path[i - 1], path[i], done ? 0x66418d : 0xfff9e9, done ? 20 : 14);
-          if (!done) line(this.ink, path[i - 1], path[i], 0x7250a0, 2);
-        }
-        for (const stroke of strokes) {
-          stroke.forEach((p, i) => line(this.ink, stroke[i - 1] ?? p, p, studioStrokeColor(p), 10));
-        }
-      });
+    [
+      [STUDIO_STAIRS, this.stairsDone, this.stairStrokes],
+      [STUDIO_GAP, this.gapDone, this.gapStrokes],
+    ].forEach(([path, done, strokes]) => {
+      for (let i = 1; i < path.length; i++) {
+        line(this.ink, path[i - 1], path[i], done ? 0x66418d : 0xfff9e9, done ? 20 : 14);
+        if (!done) line(this.ink, path[i - 1], path[i], 0x7250a0, 2);
+      }
+      for (const stroke of strokes) {
+        stroke.forEach((p, i) => line(this.ink, stroke[i - 1] ?? p, p, studioStrokeColor(p), 10));
+      }
+    });
   }
   cut(ctx, x, y, radius) {
     ctx.save();
@@ -313,8 +318,8 @@ export class StudioDark extends WorldScene {
       this.gapDone
         ? DIALOGUE.studioBridgeReady
         : this.stairsDone
-        ? DIALOGUE.studioGapHelp
-        : DIALOGUE.studioDarkHelp,
+          ? DIALOGUE.studioGapHelp
+          : DIALOGUE.studioDarkHelp,
     );
   }
 }

@@ -1,4 +1,4 @@
-import { store } from "@caper/engine";
+import { store } from "@gandazgul/caper-engine";
 import { COLORS, INK, line } from "./art.js";
 import { PATCH, SAIL } from "./puzzles/geometry.js";
 import { drawPatch } from "./puzzles/patch-art.js";
@@ -6,7 +6,7 @@ import { validStrokes } from "./state.js";
 import { trackArt } from "./WorldEditor.js";
 
 export class BoatView {
-  constructor(scene, x, y, scale = .65) {
+  constructor(scene, x, y, scale = 0.65) {
     this.scene = scene;
     this.root = scene.add.container(x, y).setDepth(4).setScale(scale);
     trackArt(scene, "boat-art", this.root);
@@ -42,7 +42,7 @@ export class BoatView {
       }
       if (!strokes.length) g.lineStyle(7, INK).strokePoints(points, true);
     } else {
-      g.lineStyle(4, INK, .45).strokePoints(points, true);
+      g.lineStyle(4, INK, 0.45).strokePoints(points, true);
     }
     const patched = store.get("patchDone") === true;
     this.patch.setVisible(patched);
@@ -58,15 +58,20 @@ export class BoatView {
   showPassengers(sprites, seats, scale) {
     this.clearPassengers();
     this.passengers = sprites.map((sprite, i) => {
-      const person = this.scene.add.image(seats[i].x, seats[i].y, sprite.texture.key, sprite.frame.name)
-        .setOrigin(sprite.originX, sprite.originY).setScale(scale).setFlipX(this.root.scaleX < 0);
+      const person = this.scene.add
+        .image(seats[i].x, seats[i].y, sprite.texture.key, sprite.frame.name)
+        .setOrigin(sprite.originX, sprite.originY)
+        .setScale(scale)
+        .setFlipX(this.root.scaleX < 0);
       this.root.add(person);
       return person;
     });
     // The original hull sits in front of their feet, so they are inside the boat.
     const source = this.base.texture.getSourceImage();
-    this.frontHull = this.scene.add.image(0, 0, "boat").setDisplaySize(600, 600)
-      .setCrop(0, source.height * .73, source.width, source.height * .27);
+    this.frontHull = this.scene.add
+      .image(0, 0, "boat")
+      .setDisplaySize(600, 600)
+      .setCrop(0, source.height * 0.73, source.width, source.height * 0.27);
     this.root.add(this.frontHull);
     this.root.bringToTop(this.patch);
     this.root.bringToTop(this.patchOutline);

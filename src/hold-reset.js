@@ -3,7 +3,10 @@ export function installResetHold(
   button,
   { shortPress, longPress, schedule = setTimeout, cancel = clearTimeout },
 ) {
-  let timer, origin, held = false, suppressClick = false;
+  let timer,
+    origin,
+    held = false,
+    suppressClick = false;
   const stop = () => {
     cancel(timer);
     timer = null;

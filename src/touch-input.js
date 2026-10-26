@@ -1,9 +1,13 @@
 import { distanceToSegment } from "./puzzles/geometry.js";
 
 export function nearestOnPath(point, path) {
-  let nearest = null, distance = Infinity;
+  let nearest = null,
+    distance = Infinity;
   for (let i = 1; i < path.length; i++) {
-    const a = path[i - 1], b = path[i], dx = b.x - a.x, dy = b.y - a.y;
+    const a = path[i - 1],
+      b = path[i],
+      dx = b.x - a.x,
+      dy = b.y - a.y;
     const length = dx * dx + dy * dy;
     const t = length ? Math.max(0, Math.min(1, ((point.x - a.x) * dx + (point.y - a.y) * dy) / length)) : 0;
     const d = distanceToSegment(point, a, b);
@@ -21,7 +25,7 @@ export function traceTouch(point, path, worldPerPixel = 1, isTouch = false) {
   if (!isTouch) return point;
   const near = nearestOnPath(point, path);
   if (!near.point || near.distance > 18 * worldPerPixel) return null;
-  const wobble = near.distance ? Math.min(.25, 3 / near.distance) : 0;
+  const wobble = near.distance ? Math.min(0.25, 3 / near.distance) : 0;
   return {
     x: near.point.x + (point.x - near.point.x) * wobble,
     y: near.point.y + (point.y - near.point.y) * wobble,
@@ -40,7 +44,7 @@ export function fingerCircle(scene, shape, minimumPixels = 44) {
     hitArea: { x: center, y: center },
     hitAreaCallback: (area, x, y) => {
       const touch = globalThis.matchMedia?.("(pointer: coarse)").matches;
-      const radius = touch ? Math.max(center, minimumPixels / 2 * worldPerPixel(scene)) : center;
+      const radius = touch ? Math.max(center, (minimumPixels / 2) * worldPerPixel(scene)) : center;
       return Math.hypot(x - area.x, y - area.y) <= radius;
     },
   });
@@ -55,13 +59,13 @@ export function fingerRect(scene, object, minimumPixels = 48) {
     hitAreaCallback: (_area, x, y) => {
       const touch = globalThis.matchMedia?.("(pointer: coarse)").matches;
       const minimum = touch ? minimumPixels * worldPerPixel(scene) : 0;
-      const w = Math.max(object.width, minimum), h = Math.max(object.height, minimum);
+      const w = Math.max(object.width, minimum),
+        h = Math.max(object.height, minimum);
       const left = object.x - object.width * object.originX;
       const top = object.y - object.height * object.originY;
       const hitLeft = Math.max(0, Math.min(scene.scale.gameSize.width - w, left - (w - object.width) / 2));
       const hitTop = Math.max(0, Math.min(scene.scale.gameSize.height - h, top - (h - object.height) / 2));
-      return x + left >= hitLeft && x + left <= hitLeft + w &&
-        y + top >= hitTop && y + top <= hitTop + h;
+      return x + left >= hitLeft && x + left <= hitLeft + w && y + top >= hitTop && y + top <= hitTop + h;
     },
   });
 }

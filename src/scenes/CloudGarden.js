@@ -1,4 +1,4 @@
-import { store } from "@caper/engine";
+import { store } from "@gandazgul/caper-engine";
 import { WorldScene } from "./WorldScene.js";
 import { drawing } from "../DrawnWorld.js";
 import { exitArrow, objectTarget } from "../WorldInteraction.js";
@@ -9,7 +9,12 @@ export class CloudGarden extends WorldScene {
     super({
       key: "CloudGarden",
       backgroundsByChapter: { paint: "cloudBackdrop" },
-      walkable: [{ x: 80, y: 625 }, { x: 1120, y: 625 }, { x: 1120, y: 755 }, { x: 80, y: 755 }],
+      walkable: [
+        { x: 80, y: 625 },
+        { x: 1120, y: 625 },
+        { x: 1120, y: 755 },
+        { x: 80, y: 755 },
+      ],
       activeCharacter: { startPosition: { x: 235, y: 715 } },
       props: [],
     });
@@ -24,11 +29,12 @@ export class CloudGarden extends WorldScene {
     objectTarget(this, "cloud-picnic", picnic, () =>
       this.scene.start("CloudPicnic", {
         decorate: store.get("villagePicnicDone") === true,
-      }));
+      }),
+    );
     if (store.get("villagePicnicDone")) {
       [620, 820, 1030].forEach((x) => drawing(this, "pinkFruit", x, 595, 35, 4));
       for (const p of validPicnicDecorations(store.get("villagePicnicDecorations"))) {
-        drawing(this, p.art, 540 + (p.x - 120) * .55, 520 + (p.y - 350) * .35, 42, 4);
+        drawing(this, p.art, 540 + (p.x - 120) * 0.55, 520 + (p.y - 350) * 0.35, 42, 4);
       }
     }
     exitArrow(this, "cloud-village", 95, 730, () => this.scene.start("Village"), "down");
@@ -38,9 +44,8 @@ export class CloudGarden extends WorldScene {
     }
   }
   hint() {
-    this.ui.dialogue([[
-      "Cloud friend",
-      store.get("villagePicnicDone") ? CLOUD_LINES.complete : CLOUD_LINES.welcome,
-    ]]);
+    this.ui.dialogue([
+      ["Cloud friend", store.get("villagePicnicDone") ? CLOUD_LINES.complete : CLOUD_LINES.welcome],
+    ]);
   }
 }

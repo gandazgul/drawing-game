@@ -1,4 +1,4 @@
-import { store } from "@caper/engine";
+import { store } from "@gandazgul/caper-engine";
 import { PuzzleScene } from "./PuzzleScene.js";
 import { COLORS, font, INK, line } from "../art.js";
 import { validStrokes } from "../state.js";
@@ -35,10 +35,10 @@ export class ForestDraw extends PuzzleScene {
     this.done = false;
     this.tapMode = false;
     this.tapIndex = 0;
-    this.add.image(600, 415, "forestGrove").setDisplaySize(1200, 520).setAlpha(.25);
+    this.add.image(600, 415, "forestGrove").setDisplaySize(1200, 520).setAlpha(0.25);
     const guide = this.add.graphics().setDepth(1);
     guide.lineStyle(40, 0xfff9e9, 1).strokePoints(DANCE_PATH);
-    guide.lineStyle(3, INK, .65).strokePoints(DANCE_PATH);
+    guide.lineStyle(3, INK, 0.65).strokePoints(DANCE_PATH);
     createBear(this, 1020, 292, 155).setDepth(2);
     this.ink = forestMarks(this, this.strokes);
     this.chips = COLORS.map((color, i) => {
@@ -96,7 +96,8 @@ export class ForestDraw extends PuzzleScene {
       this.current = [];
       this.strokes.push(this.current);
     }
-    const point = { x: pos.x, y: pos.y, c: this.color }, previous = this.current.at(-1) ?? point;
+    const point = { x: pos.x, y: pos.y, c: this.color },
+      previous = this.current.at(-1) ?? point;
     if (this.current.length && Math.hypot(point.x - previous.x, point.y - previous.y) < 2) return;
     this.current.push(point);
     this.coverage.stroke(previous, point);
@@ -147,14 +148,18 @@ export class ForestDraw extends PuzzleScene {
     );
     if (!this.tapMode) return;
     DANCE_PATH.forEach((p, i) => {
-      const dot = this.add.circle(p.x, p.y, 24, i === this.tapIndex ? 0xfddf55 : 0xfff9e9)
-        .setStrokeStyle(3, INK).setDepth(7);
+      const dot = this.add
+        .circle(p.x, p.y, 24, i === this.tapIndex ? 0xfddf55 : 0xfff9e9)
+        .setStrokeStyle(3, INK)
+        .setDepth(7);
       if (i === this.tapIndex) fingerCircle(this, dot, 48);
       dot.on("pointerdown", (_p, _x, _y, e) => {
         e.stopPropagation();
         this.tapDot(i);
       });
-      const label = this.add.text(p.x, p.y, String(i + 1), { ...font, fontSize: "29px" }).setOrigin(.5)
+      const label = this.add
+        .text(p.x, p.y, String(i + 1), { ...font, fontSize: "29px" })
+        .setOrigin(0.5)
         .setDepth(8);
       this.dots.push(dot, label);
     });
@@ -168,10 +173,16 @@ export class ForestDraw extends PuzzleScene {
       this.done = true;
       store.set("forestDanceDone", true);
       this.feedback.setText("Ready for a dance! You can keep drawing.");
-      this.button(600, 751, "Watch her dance →", () => {
-        this.persist();
-        this.scene.start("ForestEdge", { dance: true });
-      }, "#fddf55");
+      this.button(
+        600,
+        751,
+        "Watch her dance →",
+        () => {
+          this.persist();
+          this.scene.start("ForestEdge", { dance: true });
+        },
+        "#fddf55",
+      );
       this.ui.speak(...DIALOGUE.forestDrawReady[0]);
     }
   }
@@ -214,9 +225,10 @@ export class ForestNumbers extends PuzzleScene {
       this.tiles.push(tile);
       if (this.clues[i]) {
         this.add.circle(p.x, p.y, 22, 0xfff9e9).setStrokeStyle(2, INK).setDepth(4);
-        this.add.text(p.x, p.y, String(this.clues[i]), { ...font, fontSize: "30px" }).setOrigin(.5).setDepth(
-          5,
-        );
+        this.add
+          .text(p.x, p.y, String(this.clues[i]), { ...font, fontSize: "30px" })
+          .setOrigin(0.5)
+          .setDepth(5);
       }
     }
     this.undo = this.button(470, 751, "Undo", () => {
@@ -253,8 +265,8 @@ export class ForestNumbers extends PuzzleScene {
   }
   center(i) {
     return {
-      x: this.left + (i % 5 + .5) * this.cellSize,
-      y: this.top + (Math.floor(i / 5) + .5) * this.cellSize,
+      x: this.left + ((i % 5) + 0.5) * this.cellSize,
+      y: this.top + (Math.floor(i / 5) + 0.5) * this.cellSize,
     };
   }
   step(i) {
@@ -276,12 +288,13 @@ export class ForestNumbers extends PuzzleScene {
   refresh() {
     this.lines.clear();
     this.tiles.forEach((tile, i) =>
-      tile.setFillStyle(this.path.includes(i) ? 0xcee4ba : 0xf0e3b7)
-        .setStrokeStyle(i === this.path.at(-1) ? 5 : 3, i === this.path.at(-1) ? INK : 0x867a58)
+      tile
+        .setFillStyle(this.path.includes(i) ? 0xcee4ba : 0xf0e3b7)
+        .setStrokeStyle(i === this.path.at(-1) ? 5 : 3, i === this.path.at(-1) ? INK : 0x867a58),
     );
-    this.path.slice(1).forEach((cell, i) =>
-      line(this.lines, this.center(this.path[i]), this.center(cell), 0x286d38, 12)
-    );
+    this.path
+      .slice(1)
+      .forEach((cell, i) => line(this.lines, this.center(this.path[i]), this.center(cell), 0x286d38, 12));
     this.persist();
     this.feedback.setText(
       `${this.path.length} of 25 squares · ${this.path.filter((n) => this.clues[n]).length} of 6 numbers`,

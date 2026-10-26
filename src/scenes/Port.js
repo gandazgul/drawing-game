@@ -1,4 +1,4 @@
-import { store } from "@caper/engine";
+import { store } from "@gandazgul/caper-engine";
 import { WorldScene } from "./WorldScene.js";
 import { BoatView } from "../BoatView.js";
 import { DIALOGUE } from "../dialogue.js";
@@ -20,7 +20,7 @@ export class Port extends WorldScene {
       key: "Port",
       backgroundsByChapter: { paint: "portBackdrop" },
       walkable: portWalkable(false),
-      characterScales: { keila: .11, olivia: .114 },
+      characterScales: { keila: 0.11, olivia: 0.114 },
       companionSpacing: 58,
       activeCharacter: { startPosition: { x: 300, y: 622 } },
       props: [],
@@ -48,16 +48,21 @@ export class Port extends WorldScene {
     });
     drawnCritters(this, [["heartButterfly", 161, 237, 60], CHICKEN_WALKS.Port]);
     hiddenStickers(this);
-    this.boat = new BoatView(this, 825, 595, .48);
+    this.boat = new BoatView(this, 825, 595, 0.48);
     objectTarget(this, "boat", this.boat.root, () => departByBoat(this, "Pond"));
     // Small targets follow the arch instead of a giant rectangle over the sky/water.
     BRIDGE_ROUTE.forEach((p, i) =>
-      worldTarget(this, `bridge-${i}`, {
-        x: p.x - 35,
-        y: p.y - 40,
-        w: 70,
-        h: 80,
-      }, () => this.bridge())
+      worldTarget(
+        this,
+        `bridge-${i}`,
+        {
+          x: p.x - 35,
+          y: p.y - 40,
+          w: 70,
+          h: 80,
+        },
+        () => this.bridge(),
+      ),
     );
     if (repaired) {
       worldTarget(this, "village-shore", { x: 975, y: 405, w: 220, h: 205 }, () => {
@@ -125,7 +130,12 @@ export class Village extends WorldScene {
     super({
       key: "Village",
       backgroundsByChapter: { paint: "villageBackdrop" },
-      walkable: [{ x: 167, y: 599 }, { x: 1100, y: 590 }, { x: 1100, y: 730 }, { x: 90, y: 730 }],
+      walkable: [
+        { x: 167, y: 599 },
+        { x: 1100, y: 590 },
+        { x: 1100, y: 730 },
+        { x: 90, y: 730 },
+      ],
       activeCharacter: { startPosition: { x: 365, y: 675 } },
       props: [],
     });
@@ -163,13 +173,15 @@ export class Village extends WorldScene {
     rope.lineStyle(10, 0xe6ad24).lineBetween(-82, -12, -61, 1).lineBetween(-82, 12, -61, 2);
     trackArt(this, "jump-rope", rope);
     worldTarget(this, "jump-rope", { x: 739, y: 671, w: 180, h: 65 }, () => this.scene.start("JumpRope"));
-    this.ui.status(
-      "Visit our village friends. The snowy path above the party leads to the frozen pond!",
-    );
+    this.ui.status("Visit our village friends. The snowy path above the party leads to the frozen pond!");
     if (!store.get("villageArrived")) {
-      this.ui.dialogue(DIALOGUE.villageArrival, () => {
-        store.set("villageArrived", true);
-      }, "Explore the village");
+      this.ui.dialogue(
+        DIALOGUE.villageArrival,
+        () => {
+          store.set("villageArrived", true);
+        },
+        "Explore the village",
+      );
     } else messenger(this);
   }
   nextChapter() {

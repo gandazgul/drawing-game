@@ -1,16 +1,17 @@
 // Pure progress/placement rules shared by gameplay and regression tests.
 export const MATERIALS = ["twigs", "carrot", "rocks"];
-export const SLIDE_TARGETS = [.34, .61, .82];
-export const SLIDE_TOLERANCE = .13;
+export const SLIDE_TARGETS = [0.34, 0.61, 0.82];
+export const SLIDE_TOLERANCE = 0.13;
 export const materialsFound = (raw) => MATERIALS.filter((id) => Array.isArray(raw) && raw.includes(id));
 export const snowUnlocked = (raw, unlocked = false) => unlocked === true || materialsFound(raw).length === 3;
 export const nextMaterial = (raw) => MATERIALS.find((id) => !materialsFound(raw).includes(id));
 export function slidePower(milliseconds) {
-  const t = Math.max(0, milliseconds) % 3400 / 1700;
+  const t = (Math.max(0, milliseconds) % 3400) / 1700;
   return t <= 1 ? t : 2 - t;
 }
 export const slideHits = (power, material) =>
-  Number.isFinite(power) && MATERIALS.includes(material) &&
+  Number.isFinite(power) &&
+  MATERIALS.includes(material) &&
   Math.abs(power - SLIDE_TARGETS[MATERIALS.indexOf(material)]) <= SLIDE_TOLERANCE;
 
 export const SNOW_PARTS = {
@@ -28,24 +29,27 @@ export const MAX_PIECES = 60;
 export function validSnowPieces(raw) {
   if (!Array.isArray(raw)) return [];
   const seen = new Set();
-  return raw.slice(0, MAX_PIECES).filter((p) => {
-    if (!p || !Object.hasOwn(SNOW_PARTS, p.kind) || !Number.isFinite(p.x) || !Number.isFinite(p.y)) {
-      return false;
-    }
-    if (BODY_PARTS.includes(p.kind)) {
-      if (seen.has(p.kind)) return false;
-      seen.add(p.kind);
-    }
-    return true;
-  }).map((p) => {
-    const part = SNOW_PARTS[p.kind];
-    return {
-      kind: p.kind,
-      x: part.x ?? Math.max(170, Math.min(790, p.x)),
-      y: part.y ?? Math.max(190, Math.min(610, p.y)),
-      flip: p.kind === "twig" && p.x > 490,
-    };
-  });
+  return raw
+    .slice(0, MAX_PIECES)
+    .filter((p) => {
+      if (!p || !Object.hasOwn(SNOW_PARTS, p.kind) || !Number.isFinite(p.x) || !Number.isFinite(p.y)) {
+        return false;
+      }
+      if (BODY_PARTS.includes(p.kind)) {
+        if (seen.has(p.kind)) return false;
+        seen.add(p.kind);
+      }
+      return true;
+    })
+    .map((p) => {
+      const part = SNOW_PARTS[p.kind];
+      return {
+        kind: p.kind,
+        x: part.x ?? Math.max(170, Math.min(790, p.x)),
+        y: part.y ?? Math.max(190, Math.min(610, p.y)),
+        flip: p.kind === "twig" && p.x > 490,
+      };
+    });
 }
 export function placeSnowPiece(raw, kind, x, y, replacing = -1) {
   const pieces = validSnowPieces(raw);

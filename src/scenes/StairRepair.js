@@ -1,4 +1,4 @@
-import { store } from "@caper/engine";
+import { store } from "@gandazgul/caper-engine";
 import { PuzzleScene } from "./PuzzleScene.js";
 import { drawing } from "../DrawnWorld.js";
 import { DIALOGUE } from "../dialogue.js";
@@ -42,19 +42,22 @@ export class StairRepair extends PuzzleScene {
         texture.add(
           frame,
           0,
-          Math.round(p.source.x * source.width / 1200),
-          Math.round(p.source.y * source.height / 800),
-          Math.round(p.source.w * source.width / 1200),
-          Math.round(p.source.h * source.height / 800),
+          Math.round((p.source.x * source.width) / 1200),
+          Math.round((p.source.y * source.height) / 800),
+          Math.round((p.source.w * source.width) / 1200),
+          Math.round((p.source.h * source.height) / 800),
         );
       }
-      const ghost = this.add.image(p.target.x, p.target.y, "houseStairPieces", frame)
-        .setDisplaySize(p.w, p.h).setAlpha(.16);
-      const outline = this.add.rectangle(p.target.x, p.target.y, p.w, p.h).setStrokeStyle(2, 0x66418d, .7);
+      const ghost = this.add
+        .image(p.target.x, p.target.y, "houseStairPieces", frame)
+        .setDisplaySize(p.w, p.h)
+        .setAlpha(0.16);
+      const outline = this.add.rectangle(p.target.x, p.target.y, p.w, p.h).setStrokeStyle(2, 0x66418d, 0.7);
       const at = this.phase === "erase" || this.placed.has(p.id) ? p.target : p.home;
-      const image = this.add.image(at.x, at.y, "houseStairPieces", frame).setDisplaySize(p.w, p.h).setDepth(
-        3,
-      );
+      const image = this.add
+        .image(at.x, at.y, "houseStairPieces", frame)
+        .setDisplaySize(p.w, p.h)
+        .setDepth(3);
       return { ...p, image, ghost, outline };
     });
     this.selection = this.add.graphics().setDepth(4);
@@ -70,13 +73,16 @@ export class StairRepair extends PuzzleScene {
   }
   makeCover() {
     const { x, y, w, h, cols, rows } = STAIR_COVER;
-    const cw = w / cols, ch = h / rows;
+    const cw = w / cols,
+      ch = h / rows;
     for (let row = 0; row < rows; row++) {
       for (let col = 0; col < cols; col++) {
-        const id = row * cols + col, cx = x + (col + .5) * cw, cy = y + (row + .5) * ch;
+        const id = row * cols + col,
+          cx = x + (col + 0.5) * cw,
+          cy = y + (row + 0.5) * ch;
         const g = this.add.graphics().setPosition(cx, cy).setDepth(6).setVisible(!this.erased.has(id));
         g.fillStyle(0xb397bb).fillRect(-cw / 2 - 1, -ch / 2 - 1, cw + 2, ch + 2);
-        g.lineStyle(3, 0x7250a0, .65).lineBetween(-cw / 2, ch / 3, cw / 2, -ch / 3);
+        g.lineStyle(3, 0x7250a0, 0.65).lineBetween(-cw / 2, ch / 3, cw / 2, -ch / 3);
         this.covers.push({ id, x: cx, y: cy, g });
       }
     }
@@ -157,11 +163,14 @@ export class StairRepair extends PuzzleScene {
       if (
         Math.abs(p.x - chosen.target.x) < chosen.w / 2 + 14 &&
         Math.abs(p.y - chosen.target.y) < chosen.h / 2 + 14
-      ) return this.place(chosen);
+      )
+        return this.place(chosen);
     }
-    const piece = this.pieces.find((s) =>
-      !this.placed.has(s.id) &&
-      Math.abs(p.x - s.image.x) <= s.w / 2 + 5 && Math.abs(p.y - s.image.y) <= s.h / 2 + 5
+    const piece = this.pieces.find(
+      (s) =>
+        !this.placed.has(s.id) &&
+        Math.abs(p.x - s.image.x) <= s.w / 2 + 5 &&
+        Math.abs(p.y - s.image.y) <= s.h / 2 + 5,
     );
     if (!piece) return;
     this.selected = piece.id;
@@ -203,12 +212,10 @@ export class StairRepair extends PuzzleScene {
     }
   }
   highlight(piece) {
-    this.selection.clear().lineStyle(5, 0x66418d).strokeRect(
-      piece.image.x - piece.w / 2 - 3,
-      piece.image.y - piece.h / 2 - 3,
-      piece.w + 6,
-      piece.h + 6,
-    );
+    this.selection
+      .clear()
+      .lineStyle(5, 0x66418d)
+      .strokeRect(piece.image.x - piece.w / 2 - 3, piece.image.y - piece.h / 2 - 3, piece.w + 6, piece.h + 6);
   }
   place(piece) {
     this.drag = null;

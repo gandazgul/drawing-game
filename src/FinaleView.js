@@ -10,23 +10,33 @@ export function treeHouses(scene, done) {
     ["orangeHouse", 890, 332, 104],
     ["house", 400, 216, 100],
     ["studioExterior", 700, 137, 66],
-  ].map(([key, x, y, w]) => drawing(scene, key, x, y, w, 2).setAlpha(done ? 1 : .5));
+  ].map(([key, x, y, w]) => drawing(scene, key, x, y, w, 2).setAlpha(done ? 1 : 0.5));
 }
 export function finaleFruit(scene) {
-  return treeFruit(scene, [[515, 180, 39, -9], [760, 94, 32, 11], [925, 259, 37, -8], [743, 390, 34, 8]]);
+  return treeFruit(scene, [
+    [515, 180, 39, -9],
+    [760, 94, 32, 11],
+    [925, 259, 37, -8],
+    [743, 390, 34, 8],
+  ]);
 }
 export function routeArt(scene, done, strokes = []) {
   const g = scene.add.graphics().setDepth(3);
-  g.lineStyle(done ? 24 : 18, 0xfff3cd, done ? 1 : .8).strokePoints(TREE_ROUTE);
+  g.lineStyle(done ? 24 : 18, 0xfff3cd, done ? 1 : 0.8).strokePoints(TREE_ROUTE);
   if (done) g.lineStyle(17, 0xe6ad24).strokePoints(TREE_ROUTE);
   else {
     for (let i = 1; i < TREE_ROUTE.length; i++) {
-      const a = TREE_ROUTE[i - 1], b = TREE_ROUTE[i], n = Math.ceil(Math.hypot(b.x - a.x, b.y - a.y) / 22);
+      const a = TREE_ROUTE[i - 1],
+        b = TREE_ROUTE[i],
+        n = Math.ceil(Math.hypot(b.x - a.x, b.y - a.y) / 22);
       for (let j = 0; j < n; j += 2) {
         line(
           g,
-          { x: a.x + (b.x - a.x) * j / n, y: a.y + (b.y - a.y) * j / n },
-          { x: a.x + (b.x - a.x) * Math.min(j + 1, n) / n, y: a.y + (b.y - a.y) * Math.min(j + 1, n) / n },
+          { x: a.x + ((b.x - a.x) * j) / n, y: a.y + ((b.y - a.y) * j) / n },
+          {
+            x: a.x + ((b.x - a.x) * Math.min(j + 1, n)) / n,
+            y: a.y + ((b.y - a.y) * Math.min(j + 1, n)) / n,
+          },
           0x66418d,
           3,
         );
@@ -53,7 +63,9 @@ export function savedDecorations(scene, raw) {
   return validDecorations(raw).map((p) => decoration(scene, p));
 }
 export function finaleBackdrop(scene, values) {
-  scene.add.image(600, 400, values.endingWaterDone ? "endingWater" : "endingDry").setDisplaySize(1200, 800)
+  scene.add
+    .image(600, 400, values.endingWaterDone ? "endingWater" : "endingDry")
+    .setDisplaySize(1200, 800)
     .setDepth(-10);
   treeHouses(scene, values.endingHouseDone);
   finaleFruit(scene);
@@ -61,10 +73,13 @@ export function finaleBackdrop(scene, values) {
   savedDecorations(scene, values.endingDecorations);
 }
 export function sparkleBurst(scene, x, y, big = false) {
-  const reduced = scene.registry.get("reducedMotion"), count = reduced ? 6 : big ? 32 : 12;
+  const reduced = scene.registry.get("reducedMotion"),
+    count = reduced ? 6 : big ? 32 : 12;
   for (let i = 0; i < count; i++) {
-    const t = i / count * Math.PI * 2, r = big ? 125 : 30;
-    const star = scene.add.star(x, y, 4, 2, big ? 10 : 6, [0xfddf55, 0xe26487, 0xffffff, 0x45954f][i % 4])
+    const t = (i / count) * Math.PI * 2,
+      r = big ? 125 : 30;
+    const star = scene.add
+      .star(x, y, 4, 2, big ? 10 : 6, [0xfddf55, 0xe26487, 0xffffff, 0x45954f][i % 4])
       .setDepth(40);
     scene.tweens.add({
       targets: star,

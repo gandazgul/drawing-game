@@ -14,10 +14,16 @@ export const BRIDGE_ROUTE = [
   { x: 924, y: 495 },
 ];
 export function portWalkable(repaired) {
-  const shore = [{ x: 440, y: 650 }, { x: 550, y: 685 }, { x: 645, y: 710 }, { x: 650, y: 760 }, {
-    x: 70,
-    y: 760,
-  }];
+  const shore = [
+    { x: 440, y: 650 },
+    { x: 550, y: 685 },
+    { x: 645, y: 710 },
+    { x: 650, y: 760 },
+    {
+      x: 70,
+      y: 760,
+    },
+  ];
   if (!repaired) return [{ x: 70, y: 500 }, { x: 265, y: 500 }, ...shore];
   return [
     { x: 70, y: 500 },

@@ -10,7 +10,7 @@ export const DANCE_PATH = [
 ];
 export const danceWorld = (p) => ({ x: p.x, y: p.y + 220 });
 export const danceCoverage = (strokes = []) =>
-  new Coverage(traceSamples(DANCE_PATH), 20, { endRadius: 10, requiredRatio: .88 }).restore(strokes);
+  new Coverage(traceSamples(DANCE_PATH), 20, { endRadius: 10, requiredRatio: 0.88 }).restore(strokes);
 // Centerline measured against woodland-v1.webp, in the 1200×800 world.
 // Stones, repaired marks and navigation all use this same painted trail.
 export const WOODLAND_PATH = [
@@ -34,27 +34,40 @@ export function woodlandWalkable(done) {
   const path = done ? WOODLAND_PATH : WOODLAND_PATH.slice(0, 5);
   const edge = (side) =>
     path.map((p, i) => {
-      const a = path[Math.max(0, i - 1)], b = path[Math.min(path.length - 1, i + 1)];
+      const a = path[Math.max(0, i - 1)],
+        b = path[Math.min(path.length - 1, i + 1)];
       const length = Math.hypot(b.x - a.x, b.y - a.y);
       const cap = i === 0 ? -18 : i === path.length - 1 ? 18 : 0;
       return {
-        x: p.x + (b.x - a.x) / length * cap - (b.y - a.y) / length * 30 * side,
-        y: p.y + (b.y - a.y) / length * cap + (b.x - a.x) / length * 30 * side,
+        x: p.x + ((b.x - a.x) / length) * cap - ((b.y - a.y) / length) * 30 * side,
+        y: p.y + ((b.y - a.y) / length) * cap + ((b.x - a.x) / length) * 30 * side,
       };
     });
   return [...edge(1), ...edge(-1).reverse()];
 }
 export function forestWalkable(done) {
   return done
-    ? [{ x: 90, y: 620 }, { x: 420, y: 530 }, { x: 720, y: 495 }, { x: 1120, y: 465 }, { x: 1130, y: 710 }, {
-      x: 90,
-      y: 750,
-    }]
-    : [{ x: 90, y: 620 }, { x: 395, y: 620 }, { x: 395, y: 750 }, { x: 90, y: 750 }];
+    ? [
+        { x: 90, y: 620 },
+        { x: 420, y: 530 },
+        { x: 720, y: 495 },
+        { x: 1120, y: 465 },
+        { x: 1130, y: 710 },
+        {
+          x: 90,
+          y: 750,
+        },
+      ]
+    : [
+        { x: 90, y: 620 },
+        { x: 395, y: 620 },
+        { x: 395, y: 750 },
+        { x: 90, y: 750 },
+      ];
 }
 export const neighbors = (cell) =>
-  Array.from({ length: 25 }, (_, i) => i).filter((i) =>
-    Math.abs(i % 5 - cell % 5) + Math.abs(Math.floor(i / 5) - Math.floor(cell / 5)) === 1
+  Array.from({ length: 25 }, (_, i) => i).filter(
+    (i) => Math.abs((i % 5) - (cell % 5)) + Math.abs(Math.floor(i / 5) - Math.floor(cell / 5)) === 1,
   );
 const checkpoints = [0, 4, 8, 13, 18, 24];
 // Daybook's Number Path backbite construction: a Hamiltonian route, not a random
@@ -67,10 +80,10 @@ export function newForestBoard(seed) {
   };
   let solution = Array.from({ length: 25 }, (_, i) => {
     const row = Math.floor(i / 5);
-    return row * 5 + (row % 2 ? 4 - i % 5 : i % 5);
+    return row * 5 + (row % 2 ? 4 - (i % 5) : i % 5);
   });
   for (let i = 0; i < 250; i++) {
-    if (random() < .5) solution.reverse();
+    if (random() < 0.5) solution.reverse();
     const options = neighbors(solution[0]).filter((cell) => cell !== solution[1]);
     const index = solution.indexOf(options[Math.floor(random() * options.length)]);
     if (index > 1) solution = [...solution.slice(0, index).reverse(), ...solution.slice(index)];
@@ -88,10 +101,13 @@ export function canForestStep(board, path, cell) {
   return (!clues[cell] || clues[cell] === next) && (clues[cell] !== 6 || path.length === 24);
 }
 export function safeForestBoard(raw, seed = 1) {
-  const valid = raw?.version === 1 && Array.isArray(raw.solution) && raw.solution.length === 25 &&
+  const valid =
+    raw?.version === 1 &&
+    Array.isArray(raw.solution) &&
+    raw.solution.length === 25 &&
     new Set(raw.solution).size === 25 &&
-    raw.solution.every((n, i, a) =>
-      Number.isInteger(n) && n >= 0 && n < 25 && (!i || neighbors(a[i - 1]).includes(n))
+    raw.solution.every(
+      (n, i, a) => Number.isInteger(n) && n >= 0 && n < 25 && (!i || neighbors(a[i - 1]).includes(n)),
     );
   if (!valid) return newForestBoard(seed);
   const board = { version: 1, seed: raw.seed >>> 0, solution: [...raw.solution], path: [] };
@@ -121,7 +137,8 @@ export function forestCompletion(board, path = board.path) {
     if (--budget < 0) return null;
     if (route.length === 25) return [...route];
     const free = new Set(Array.from({ length: 25 }, (_, i) => i).filter((n) => !route.includes(n)));
-    const seen = new Set(), queue = [free.values().next().value];
+    const seen = new Set(),
+      queue = [free.values().next().value];
     while (queue.length) {
       const n = queue.pop();
       if (seen.has(n)) continue;

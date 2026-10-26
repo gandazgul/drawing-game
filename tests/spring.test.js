@@ -1,12 +1,13 @@
-import { assert, assertEquals } from "@std/assert";
+import { assert, test } from "vite-plus/test";
 import { createWaterway } from "../src/puzzles/waterway.js";
 import { currentPoint, SPRING_BOARD, SPRING_BUBBLES, springFillOrder } from "../src/puzzles/spring.js";
 
-Deno.test("spring fills every solved network from the inlet in connected order", () => {
+test("spring fills every solved network from the inlet in connected order", () => {
   for (let seed = 1; seed <= 100; seed++) {
-    const cells = createWaterway(seed).solution, order = springFillOrder(cells);
-    assertEquals(order[0], 0);
-    assertEquals(new Set(order).size, 25);
+    const cells = createWaterway(seed).solution,
+      order = springFillOrder(cells);
+    assert.deepEqual(order[0], 0);
+    assert.deepEqual(new Set(order).size, 25);
     const seen = new Set([0]);
     for (const i of order.slice(1)) {
       const neighbors = [
@@ -15,16 +16,14 @@ Deno.test("spring fills every solved network from the inlet in connected order",
         i < 20 ? i + 5 : -1,
         i % 5 ? i - 1 : -1,
       ];
-      assert(
-        neighbors.some((j, d) => seen.has(j) && (cells[i] & (1 << d)) && (cells[j] & (1 << ((d + 2) % 4)))),
-      );
+      assert(neighbors.some((j, d) => seen.has(j) && cells[i] & (1 << d) && cells[j] & (1 << ((d + 2) % 4))));
       seen.add(i);
     }
   }
 });
 
-Deno.test("bubble targets surround the actual spring and settle near its base", () => {
-  assertEquals(SPRING_BUBBLES.length, 8);
+test("bubble targets surround the actual spring and settle near its base", () => {
+  assert.deepEqual(SPRING_BUBBLES.length, 8);
   for (const p of SPRING_BUBBLES) {
     assert(p.x >= SPRING_BOARD.x && p.x <= SPRING_BOARD.x + SPRING_BOARD.size);
     assert(p.y >= SPRING_BOARD.y && p.y <= SPRING_BOARD.y + SPRING_BOARD.size);
@@ -32,7 +31,7 @@ Deno.test("bubble targets surround the actual spring and settle near its base", 
   }
 });
 
-Deno.test("current stays inside the water and joins continuously between segments", () => {
+test("current stays inside the water and joins continuously between segments", () => {
   for (let i = 0; i <= 1000; i++) {
     const p = currentPoint(i / 1000);
     assert(p.x > 500 && p.x <= 1160 && p.y >= 100 && p.y <= 620);

@@ -1,4 +1,4 @@
-import { assert, assertAlmostEquals, assertEquals } from "@std/assert";
+import { assert, test } from "vite-plus/test";
 import {
   BRIDGE_PATHS,
   bridgeBandCoverage,
@@ -13,15 +13,15 @@ import {
 import { bridgeCloseup, drawBridgeBands, worldBridge } from "../src/BridgeView.js";
 import { resumeScene, villageReady } from "../src/state.js";
 
-Deno.test("all seven matching colors are required; old partial matches survive", () => {
-  assertEquals(safeColors([1, 3, 5, 5, -1, "2", 8]), [1, 3, 5]);
+test("all seven matching colors are required; old partial matches survive", () => {
+  assert.deepEqual(safeColors([1, 3, 5, 5, -1, "2", 8]), [1, 3, 5]);
   assert(!colorsReady([1, 3, 5]));
   for (let missing = 0; missing < 7; missing++) {
     assert(!colorsReady([0, 1, 2, 3, 4, 5, 6].filter((i) => i !== missing)));
   }
   assert(colorsReady([6, 5, 4, 3, 2, 1, 0]));
 });
-Deno.test("each band needs its own connected trace, not a single arch or wrong stripe", () => {
+test("each band needs its own connected trace, not a single arch or wrong stripe", () => {
   const bands = BRIDGE_PATHS.map((path) => [path.map((p) => ({ ...p }))]);
   assert(bridgeBandsReady(bands));
   assert(!bridgeBandsReady(bands, true));
@@ -37,25 +37,35 @@ Deno.test("each band needs its own connected trace, not a single arch or wrong s
     assert(!bridgeBandCoverage(i, [BRIDGE_PATHS[i].slice(2, -2)]).complete(), "both ends must connect");
   }
 });
-Deno.test("band progress restores, tolerates small middle gaps and accepts more marks", () => {
+test("band progress restores, tolerates small middle gaps and accepts more marks", () => {
   const path = BRIDGE_PATHS[0];
   const strokes = [path.slice(0, 12), path.slice(13)];
   const c = bridgeBandCoverage(0, strokes);
   assert(c.complete());
   assert(!c.complete({ strokeActive: true }));
   const saved = safeBridgeBands(JSON.parse(JSON.stringify([strokes])));
-  assertEquals(bridgeBandCoverage(0, saved[0]).ratio, c.ratio);
+  assert.deepEqual(bridgeBandCoverage(0, saved[0]).ratio, c.ratio);
   c.stroke(path[12], path[13]);
   assert(c.complete());
-  assertEquals(safeBridgeBands(null), [[], [], [], [], [], [], []]);
-  assertEquals(safeBridgeBands([[[{ x: NaN, y: 12 }, { x: 500, y: 220 }]]])[0], [[{ x: 500, y: 220 }]]);
+  assert.deepEqual(safeBridgeBands(null), [[], [], [], [], [], [], []]);
+  assert.deepEqual(
+    safeBridgeBands([
+      [
+        [
+          { x: NaN, y: 12 },
+          { x: 500, y: 220 },
+        ],
+      ],
+    ])[0],
+    [[{ x: 500, y: 220 }]],
+  );
 });
-Deno.test("port marks are projected back onto the exact same source-pixel gaps", () => {
+test("port marks are projected back onto the exact same source-pixel gaps", () => {
   for (const path of BRIDGE_PATHS) {
     for (const p of path) {
       const restored = bridgePoint(bridgeSource(p));
-      assertAlmostEquals(restored.x, p.x);
-      assertAlmostEquals(restored.y, p.y);
+      assert.closeTo(restored.x, p.x, 1e-7);
+      assert.closeTo(restored.y, p.y, 1e-7);
     }
   }
   const calls = [];
@@ -79,10 +89,10 @@ Deno.test("port marks are projected back onto the exact same source-pixel gaps",
   };
   drawBridgeBands(g, [[BRIDGE_PATHS[0]]], true);
   const expected = bridgePoint(bridgeSource(BRIDGE_PATHS[0][0]), true);
-  assertAlmostEquals(calls[0][0], expected.x);
-  assertAlmostEquals(calls[0][1], expected.y);
+  assert.closeTo(calls[0][0], expected.x, 1e-7);
+  assert.closeTo(calls[0][1], expected.y, 1e-7);
 });
-Deno.test("legacy completed bridges stay open and new drawing resumes at the port", () => {
+test("legacy completed bridges stay open and new drawing resumes at the port", () => {
   const old = {
     sailDone: true,
     patchDone: true,
@@ -92,10 +102,10 @@ Deno.test("legacy completed bridges stay open and new drawing resumes at the por
     bridgeColors: [1, 3, 5],
   };
   assert(villageReady(old));
-  assertEquals(resumeScene({ ...old, currentScene: "BridgeDraw" }), "Port");
+  assert.deepEqual(resumeScene({ ...old, currentScene: "BridgeDraw" }), "Port");
 });
 
-Deno.test("bridge close-up never changes the port texture's default frame", () => {
+test("bridge close-up never changes the port texture's default frame", () => {
   const source = {};
   const cropCalls = [];
   const images = [];
@@ -106,7 +116,7 @@ Deno.test("bridge close-up never changes the port texture's default frame", () =
       exists: (key) => textures.has(key),
       get: (key) => textures.get(key),
       addImage(key, image) {
-        assertEquals(image, source);
+        assert.deepEqual(image, source);
         const texture = { get: () => ({ setSize: (...args) => cropCalls.push(args) }) };
         textures.set(key, texture);
         return texture;
@@ -147,20 +157,30 @@ Deno.test("bridge close-up never changes the port texture's default frame", () =
   };
   bridgeCloseup(scene);
   bridgeCloseup(scene);
-  assertEquals(cropCalls, [[1310, 780, 0, 0]]);
-  assertEquals(images, ["bridge-closeup", "bridge-closeup"]);
-  assertEquals(textures.get("rainbow"), port);
+  assert.deepEqual(cropCalls, [[1310, 780, 0, 0]]);
+  assert.deepEqual(images, ["bridge-closeup", "bridge-closeup"]);
+  assert.deepEqual(textures.get("rainbow"), port);
 });
-Deno.test("source art migration preserves partial strokes and runs only once", () => {
-  const original = [[[{ x: 470, y: 215 }, { x: 510, y: 211 }]], [], []];
+test("source art migration preserves partial strokes and runs only once", () => {
+  const original = [
+    [
+      [
+        { x: 470, y: 215 },
+        { x: 510, y: 211 },
+      ],
+    ],
+    [],
+    [],
+  ];
   const migrated = migrateBridgeBands(original, undefined);
-  assertEquals(migrated[0][0].length, 2);
-  assertEquals(migrateBridgeBands(migrated, 2), migrated);
-  assertEquals(migrateBridgeBands(null, undefined), [[], [], [], [], [], [], []]);
+  assert.deepEqual(migrated[0][0].length, 2);
+  assert.deepEqual(migrateBridgeBands(migrated, 2), migrated);
+  assert.deepEqual(migrateBridgeBands(null, undefined), [[], [], [], [], [], [], []]);
 });
 
-Deno.test("world bridge cuts only its own texture and never paints over scenery", () => {
-  const cleared = [], used = [];
+test("world bridge cuts only its own texture and never paints over scenery", () => {
+  const cleared = [],
+    used = [];
   const source = { width: 1310, height: 780 };
   const scene = {
     textures: {
@@ -192,7 +212,7 @@ Deno.test("world bridge cuts only its own texture and never paints over scenery"
   };
   worldBridge(scene, false);
   worldBridge(scene, true);
-  assertEquals(cleared.length, 1);
+  assert.deepEqual(cleared.length, 1);
   assert(cleared[0][2] > 0);
-  assertEquals(used, ["rainbow-world-gap", "rainbow"]);
+  assert.deepEqual(used, ["rainbow-world-gap", "rainbow"]);
 });

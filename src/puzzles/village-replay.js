@@ -1,8 +1,17 @@
 // Saved puzzle sessions: randomness belongs at the start, never on scene redraw.
-export const LEGACY_PATTERNS = [[0, 1, 0, 1, 0, 1], [2, 3, 4, 2, 3, 4], [0, 0, 2, 0, 0, 2]];
+export const LEGACY_PATTERNS = [
+  [0, 1, 0, 1, 0, 1],
+  [2, 3, 4, 2, 3, 4],
+  [0, 0, 2, 0, 0, 2],
+];
 // The three shown flags uniquely identify these families. ABA would be ambiguous
 // with AB from only three clues, so it is deliberately not in the deck.
-const PATTERN_UNITS = [[0, 1], [0, 1, 2], [0, 0, 1], [0, 1, 1]];
+const PATTERN_UNITS = [
+  [0, 1],
+  [0, 1, 2],
+  [0, 0, 1],
+  [0, 1, 1],
+];
 export function shuffled(items, random = Math.random) {
   const result = [...items];
   for (let i = result.length - 1; i > 0; i--) {
@@ -13,17 +22,23 @@ export function shuffled(items, random = Math.random) {
 }
 const color = (n) => Number.isInteger(n) && n >= 0 && n < 5;
 export const validPatterns = (rows) =>
-  Array.isArray(rows) && rows.length === 3 &&
-  rows.every((row) =>
-    Array.isArray(row) && row.length === 6 && row.every(color) &&
-    PATTERN_UNITS.some((unit) => row.every((value, i) => value === row[i % unit.length]))
+  Array.isArray(rows) &&
+  rows.length === 3 &&
+  rows.every(
+    (row) =>
+      Array.isArray(row) &&
+      row.length === 6 &&
+      row.every(color) &&
+      PATTERN_UNITS.some((unit) => row.every((value, i) => value === row[i % unit.length])),
   );
-export const validAnswers = (raw) => Array.from({ length: 9 }, (_, i) => color(raw?.[i]) ? raw[i] : null);
+export const validAnswers = (raw) => Array.from({ length: 9 }, (_, i) => (color(raw?.[i]) ? raw[i] : null));
 export function newPatterns(previous, random = Math.random) {
-  const rows = shuffled(PATTERN_UNITS, random).slice(0, 3).map((unit) => {
-    const colors = shuffled([0, 1, 2, 3, 4], random);
-    return Array.from({ length: 6 }, (_, i) => colors[unit[i % unit.length]]);
-  });
+  const rows = shuffled(PATTERN_UNITS, random)
+    .slice(0, 3)
+    .map((unit) => {
+      const colors = shuffled([0, 1, 2, 3, 4], random);
+      return Array.from({ length: 6 }, (_, i) => colors[unit[i % unit.length]]);
+    });
   // Even a repeated random stream must not serve the identical completed puzzle.
   return JSON.stringify(rows) === JSON.stringify(previous)
     ? rows.map((row) => row.map((n) => (n + 1) % 5))
@@ -51,9 +66,10 @@ export function jigsawSession(raw, random = Math.random) {
       picture: raw.picture,
       remaining: remaining.filter((key) => key !== raw.picture),
       placed: validPieces(raw.placed),
-      order: raw.order?.length === 25 && validPieces(raw.order).length === 25
-        ? [...raw.order]
-        : shuffled(pieceIds, random),
+      order:
+        raw.order?.length === 25 && validPieces(raw.order).length === 25
+          ? [...raw.order]
+          : shuffled(pieceIds, random),
       complete: false,
     };
   }

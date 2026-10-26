@@ -80,7 +80,8 @@ export function resumeScene(values) {
   if (
     ["StudioGallery", "WorkshopPicture", "StudioDark", "StudioWorkroom", "StudioHome"].includes(
       values.currentScene,
-    ) && villageReady(values)
+    ) &&
+    villageReady(values)
   ) {
     if (!values.forestDanceDone) return "ForestEdge";
     if (!values.forestTrailDone) return "ForestTrail";
@@ -89,13 +90,14 @@ export function resumeScene(values) {
     return values.currentScene === "StudioHome"
       ? "StudioWorkroom"
       : values.currentScene === "WorkshopPicture"
-      ? "StudioGallery"
-      : values.currentScene;
+        ? "StudioGallery"
+        : values.currentScene;
   }
   if (
     ["ForestEdge", "ForestDraw", "ForestTrail", "ForestNumbers", "StudioApproach"].includes(
       values.currentScene,
-    ) && villageReady(values)
+    ) &&
+    villageReady(values)
   ) {
     if (!values.forestDanceDone) return "ForestEdge";
     if (values.currentScene === "ForestDraw") return "ForestEdge";
@@ -111,11 +113,14 @@ export function resumeScene(values) {
   }
   if (values.currentScene === "StairRepair" && villageReady(values)) return "House";
   if (
-    values.currentScene === "VillageInterior" && villageReady(values) &&
+    values.currentScene === "VillageInterior" &&
+    villageReady(values) &&
     !(Array.isArray(values.villageTasks) && values.villageTasks.includes("garden"))
-  ) return "InnGarden";
+  )
+    return "InnGarden";
   if (
-    ["FrozenPond", "PenguinSlide", "SnowmanBuilder"].includes(values.currentScene) && villageReady(values)
+    ["FrozenPond", "PenguinSlide", "SnowmanBuilder"].includes(values.currentScene) &&
+    villageReady(values)
   ) {
     return "FrozenPond";
   }
@@ -130,7 +135,8 @@ export function resumeScene(values) {
       "JumpRope",
       "PictureMemory",
       "ForestEdge",
-    ].includes(values.currentScene) && villageReady(values)
+    ].includes(values.currentScene) &&
+    villageReady(values)
   ) {
     return values.currentScene;
   }
@@ -148,10 +154,22 @@ export const villageReady = (values) => portReady(values) && values.bridgeDone =
 // without resetting or overwriting the player's story and collection progress.
 export function validStrokes(raw) {
   if (!Array.isArray(raw)) return [];
-  return raw.slice(0, 120).filter(Array.isArray).map((stroke) =>
-    stroke.slice(0, 1600).filter((p) =>
-      p && Number.isFinite(p.x) && Number.isFinite(p.y) &&
-      p.x >= 0 && p.x <= 1200 && p.y >= 0 && p.y <= 800
+  return raw
+    .slice(0, 120)
+    .filter(Array.isArray)
+    .map((stroke) =>
+      stroke
+        .slice(0, 1600)
+        .filter(
+          (p) =>
+            p &&
+            Number.isFinite(p.x) &&
+            Number.isFinite(p.y) &&
+            p.x >= 0 &&
+            p.x <= 1200 &&
+            p.y >= 0 &&
+            p.y <= 800,
+        ),
     )
-  ).filter((stroke) => stroke.length);
+    .filter((stroke) => stroke.length);
 }

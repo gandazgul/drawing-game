@@ -53,10 +53,10 @@ export const font = { fontFamily: "Schoolbell", color: "#292b4b", fontSize: "30p
 export function drawHeart(g, x, y, size, color, filled = false) {
   const points = [];
   for (let i = 0; i <= 64; i++) {
-    const t = i / 64 * Math.PI * 2;
+    const t = (i / 64) * Math.PI * 2;
     points.push({
       x: x + size * Math.sin(t) ** 3,
-      y: y - size * (13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t)) / 16,
+      y: y - (size * (13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t))) / 16,
     });
   }
   g.lineStyle(5, color, 1).strokePoints(points, true);
@@ -66,5 +66,7 @@ export function drawHeart(g, x, y, size, color, filled = false) {
 
 export function line(g, a, b, color, width = 8) {
   g.lineStyle(width, color, 1).lineBetween(a.x, a.y, b.x, b.y);
-  g.fillStyle(color).fillCircle(a.x, a.y, width / 2).fillCircle(b.x, b.y, width / 2);
+  g.fillStyle(color)
+    .fillCircle(a.x, a.y, width / 2)
+    .fillCircle(b.x, b.y, width / 2);
 }

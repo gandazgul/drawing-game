@@ -1,5 +1,5 @@
 import Phaser from "phaser";
-import { store } from "@caper/engine";
+import { store } from "@gandazgul/caper-engine";
 import { font } from "../art.js";
 
 // Shared lifecycle and large paper controls for discrete, non-drawing puzzles.
@@ -11,10 +11,10 @@ export class PuzzleScene extends Phaser.Scene {
     this.ui.setScene(this, place);
     store.setCurrentScene(this.scene.key);
     this.cameras.main.setBackgroundColor("#fff9e9");
-    this.add.text(600, 45, title, { ...font, fontSize: "42px" }).setOrigin(.5);
-    this.instructions = this.add.text(600, 103, instruction, { ...font, fontSize: "26px" }).setOrigin(.5);
+    this.add.text(600, 45, title, { ...font, fontSize: "42px" }).setOrigin(0.5);
+    this.instructions = this.add.text(600, 103, instruction, { ...font, fontSize: "26px" }).setOrigin(0.5);
     this.ui.status(instruction);
-    this.feedback = this.add.text(600, 674, "", { ...font, fontSize: "28px" }).setOrigin(.5);
+    this.feedback = this.add.text(600, 674, "", { ...font, fontSize: "28px" }).setOrigin(0.5);
     const names = {
       CloudGarden: "Cloud garden",
       TreeClearing: "Tree house",
@@ -32,12 +32,16 @@ export class PuzzleScene extends Phaser.Scene {
     this.input.keyboard.on("keydown-ESC", () => this.leave());
   }
   button(x, y, label, action, color = "#eadff4") {
-    const b = this.add.text(x, y, label, {
-      ...font,
-      fontSize: "27px",
-      backgroundColor: color,
-      padding: { x: 20, y: 14 },
-    }).setOrigin(.5).setDepth(25).setInteractive({ useHandCursor: true });
+    const b = this.add
+      .text(x, y, label, {
+        ...font,
+        fontSize: "27px",
+        backgroundColor: color,
+        padding: { x: 20, y: 14 },
+      })
+      .setOrigin(0.5)
+      .setDepth(25)
+      .setInteractive({ useHandCursor: true });
     b.on("pointerdown", (_p, _x, _y, e) => {
       e.stopPropagation();
       if (!this.blocked) action();

@@ -13,7 +13,8 @@ export const SPRING_BUBBLES = [
 
 // Breadth-first filling makes the water travel from the inlet, never randomly.
 export function springFillOrder(cells) {
-  const seen = new Set([0]), order = [0];
+  const seen = new Set([0]),
+    order = [0];
   for (let k = 0; k < order.length; k++) {
     const i = order[k];
     const neighbors = [i >= 5 ? i - 5 : -1, i % 5 < 4 ? i + 1 : -1, i < 20 ? i + 5 : -1, i % 5 ? i - 1 : -1];
@@ -38,12 +39,16 @@ export const CURRENT_ROUTE = [
 
 export function currentPoint(t, lane = 0) {
   const scaled = Math.max(0, Math.min(1, t)) * (CURRENT_ROUTE.length - 1);
-  const i = Math.min(CURRENT_ROUTE.length - 2, Math.floor(scaled)), f = scaled - i;
-  const a = CURRENT_ROUTE[i], b = CURRENT_ROUTE[i + 1];
+  const i = Math.min(CURRENT_ROUTE.length - 2, Math.floor(scaled)),
+    f = scaled - i;
+  const a = CURRENT_ROUTE[i],
+    b = CURRENT_ROUTE[i + 1];
   const previous = CURRENT_ROUTE[Math.max(0, i - 1)],
     next = CURRENT_ROUTE[Math.min(CURRENT_ROUTE.length - 1, i + 2)];
   const curve = (key) =>
-    .5 * ((2 * a[key]) + (-previous[key] + b[key]) * f +
+    0.5 *
+    (2 * a[key] +
+      (-previous[key] + b[key]) * f +
       (2 * previous[key] - 5 * a[key] + 4 * b[key] - next[key]) * f * f +
       (-previous[key] + 3 * a[key] - 3 * b[key] + next[key]) * f * f * f);
   return { x: curve("x"), y: curve("y") + lane, right: b.x >= a.x };

@@ -1,4 +1,4 @@
-import { store } from "@caper/engine";
+import { store } from "@gandazgul/caper-engine";
 import { WorldScene } from "./WorldScene.js";
 import { drawing, drawnCritters, treeFruit } from "../DrawnWorld.js";
 import { exitArrow, objectTarget, worldTarget } from "../WorldInteraction.js";
@@ -20,7 +20,7 @@ function config(key, background) {
     key,
     backgroundsByChapter: { paint: background },
     walkable: forestWalkable(false),
-    characterScales: { keila: .19, olivia: .197 },
+    characterScales: { keila: 0.19, olivia: 0.197 },
     companionSpacing: 95,
     activeCharacter: { startPosition: { x: 270, y: 720 } },
     props: [],
@@ -61,7 +61,12 @@ function flowers(scene) {
 // The background plate no longer contains the generated cottage.
 function woodlandArt(scene) {
   drawing(scene, "grapevineTree", 210, 475, 350, 1);
-  treeFruit(scene, [[120, 135, 39, -12], [236, 211, 34, 9], [1070, 174, 39, -7], [1150, 110, 32, 12]]);
+  treeFruit(scene, [
+    [120, 135, 39, -12],
+    [236, 211, 34, 9],
+    [1070, 174, 39, -7],
+    [1150, 110, 32, 12],
+  ]);
   return drawing(scene, "studioExterior", 950, 360, 230, 1);
 }
 
@@ -76,28 +81,42 @@ export class ForestEdge extends WorldScene {
     super.create(data);
     this.ui.setScene(this, "The dancing grove");
     drawing(this, "grapevineTree", 210, 565, 370, 1);
-    treeFruit(this, [[94, 170, 43, -10], [213, 232, 35, 12], [1030, 151, 41, 8], [1135, 230, 36, -9]]);
+    treeFruit(this, [
+      [94, 170, 43, -10],
+      [213, 232, 35, 12],
+      [1030, 151, 41, 8],
+      [1135, 230, 36, -9],
+    ]);
     flowers(this);
     const guide = this.add.graphics().setDepth(1);
-    guide.lineStyle(done ? 34 : 28, 0xfff9e9, .8).strokePoints(DANCE_PATH.map(danceWorld));
-    if (!done) guide.lineStyle(3, 0x513272, .7).strokePoints(DANCE_PATH.map(danceWorld));
+    guide.lineStyle(done ? 34 : 28, 0xfff9e9, 0.8).strokePoints(DANCE_PATH.map(danceWorld));
+    if (!done) guide.lineStyle(3, 0x513272, 0.7).strokePoints(DANCE_PATH.map(danceWorld));
     forestMarks(this, validStrokes(store.get("forestStrokes")), true);
     this.bear = createBear(this, done ? 990 : 460, done ? 500 : 570, 255);
     objectTarget(this, "ballerina", this.bear, () => {
       if (done) this.dance();
       else this.scene.start("ForestDraw");
     });
-    DANCE_PATH.map(danceWorld).slice(1).forEach((p, i) =>
-      worldTarget(this, `dance-trail-${i}`, { x: p.x - 50, y: p.y - 24, w: 100, h: 60 }, () => {
-        if (done) onward(this, "ForestTrail");
-        else this.scene.start("ForestDraw");
-      })
-    );
+    DANCE_PATH.map(danceWorld)
+      .slice(1)
+      .forEach((p, i) =>
+        worldTarget(this, `dance-trail-${i}`, { x: p.x - 50, y: p.y - 24, w: 100, h: 60 }, () => {
+          if (done) onward(this, "ForestTrail");
+          else this.scene.start("ForestDraw");
+        }),
+      );
     exitArrow(this, "village", 85, 735, () => this.scene.start("Village"));
-    exitArrow(this, "woodland", 1110, 565, () => {
-      if (done) onward(this, "ForestTrail");
-      else this.ui.dialogue(DIALOGUE.forestBearHelp);
-    }, "right");
+    exitArrow(
+      this,
+      "woodland",
+      1110,
+      565,
+      () => {
+        if (done) onward(this, "ForestTrail");
+        else this.ui.dialogue(DIALOGUE.forestBearHelp);
+      },
+      "right",
+    );
     this.ui.status(
       done
         ? "Tap the bear for another dance, or follow the trail to the right."
@@ -115,7 +134,8 @@ export class ForestEdge extends WorldScene {
       this.ui.setBusy(false);
       // The editor and hotspot continue to refer to the bear's final position.
       const h = this.hotspots.list().find((h) => h.id === "ballerina");
-      const b = this.bear.getBounds(), zone = this.hotspots.zones.get("ballerina");
+      const b = this.bear.getBounds(),
+        zone = this.hotspots.zones.get("ballerina");
       Object.assign(h.bounds, { x: b.x, y: b.y, w: b.width, h: b.height });
       zone.setPosition(b.x, b.y).setSize(b.width, b.height);
       zone.input.hitArea.setSize(b.width, b.height);
@@ -167,7 +187,10 @@ export class ForestTrail extends WorldScene {
     stones.forEach((p, i) => {
       g.fillStyle(done ? 0xcee4ba : 0xfff9e9).fillRoundedRect(p.x - 28, p.y - 19, 56, 38, 12);
       g.lineStyle(3, 0x513272).strokeRoundedRect(p.x - 28, p.y - 19, 56, 38, 12);
-      this.add.text(p.x, p.y, String(i + 1), { ...font, fontSize: "28px" }).setOrigin(.5).setDepth(3);
+      this.add
+        .text(p.x, p.y, String(i + 1), { ...font, fontSize: "28px" })
+        .setOrigin(0.5)
+        .setDepth(3);
       worldTarget(this, `woodland-stone-${i}`, { x: p.x - 40, y: p.y - 35, w: 80, h: 70 }, () => {
         this.scene.start("ForestNumbers");
       });

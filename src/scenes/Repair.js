@@ -1,5 +1,5 @@
 import Phaser from "phaser";
-import { store } from "@caper/engine";
+import { store } from "@gandazgul/caper-engine";
 import { COLORS, font, INK, line } from "../art.js";
 import { validStrokes } from "../state.js";
 import { DIALOGUE } from "../dialogue.js";
@@ -38,63 +38,68 @@ export class Repair extends Phaser.Scene {
     this.blocked = false;
     this.strokes = validStrokes(store.get(`${this.kind}Strokes`));
     this.color = store.getActiveCharacter() === "keila" ? COLORS[1] : COLORS[0];
-    this.coverage = (this.tracing ? traceCoverage(this.outline) : patchCoverage())
-      .restore(this.strokes);
+    this.coverage = (this.tracing ? traceCoverage(this.outline) : patchCoverage()).restore(this.strokes);
     this.ui.setScene(
       this,
       this.kind === "bridge"
         ? "Draw the rainbow bridge"
         : this.kind === "sail"
-        ? "Draw a sail"
-        : "Patch the boat",
+          ? "Draw a sail"
+          : "Patch the boat",
     );
     store.setCurrentScene(this.returnScene);
     this.cameras.main.setBackgroundColor("#fff9e9");
-    this.add.text(
-      600,
-      44,
-      this.kind === "bridge"
-        ? "A bridge into the village"
-        : this.kind === "sail"
-        ? "A sail for our boat"
-        : "A patch to keep us dry",
-      {
-        ...font,
-        fontSize: "42px",
-      },
-    ).setOrigin(.5);
-    this.subtitle = this.add.text(
-      600,
-      97,
-      this.kind === "bridge"
-        ? "Draw along the arch. Keep adding marks when it's ready."
-        : this.kind === "sail"
-        ? "Draw along the three sides. Wobbles are welcome."
-        : "Color over the hole. Keep going until your patch holds!",
-      { ...font, fontSize: "26px" },
-    ).setOrigin(.5);
+    this.add
+      .text(
+        600,
+        44,
+        this.kind === "bridge"
+          ? "A bridge into the village"
+          : this.kind === "sail"
+            ? "A sail for our boat"
+            : "A patch to keep us dry",
+        {
+          ...font,
+          fontSize: "42px",
+        },
+      )
+      .setOrigin(0.5);
+    this.subtitle = this.add
+      .text(
+        600,
+        97,
+        this.kind === "bridge"
+          ? "Draw along the arch. Keep adding marks when it's ready."
+          : this.kind === "sail"
+            ? "Draw along the three sides. Wobbles are welcome."
+            : "Color over the hole. Keep going until your patch holds!",
+        { ...font, fontSize: "26px" },
+      )
+      .setOrigin(0.5);
     if (this.kind === "bridge") {
       const rainbow = this.add.graphics();
       RAINBOW.forEach((color, i) =>
-        rainbow.lineStyle(17, color, .5).strokePoints(BRIDGE.map((p) => ({ x: p.x, y: p.y + 24 + i * 19 })))
+        rainbow.lineStyle(17, color, 0.5).strokePoints(BRIDGE.map((p) => ({ x: p.x, y: p.y + 24 + i * 19 }))),
       );
-    } else {this.add.image(600, this.kind === "sail" ? 425 : 145, "boat").setDisplaySize(
-        this.kind === "sail" ? 600 : 1160,
-        this.kind === "sail" ? 600 : 1160,
-      );}
+    } else {
+      this.add
+        .image(600, this.kind === "sail" ? 425 : 145, "boat")
+        .setDisplaySize(this.kind === "sail" ? 600 : 1160, this.kind === "sail" ? 600 : 1160);
+    }
     // The enlarged hull is a close-up, not another item to collect.
     if (this.kind === "patch") {
       this.add.rectangle(600, 77, 1200, 154, 0xfff9e9).setDepth(1);
       this.subtitle.setDepth(2);
-      this.add.text(600, 44, "A patch to keep us dry", { ...font, fontSize: "42px" }).setOrigin(.5).setDepth(
-        2,
-      );
+      this.add
+        .text(600, 44, "A patch to keep us dry", { ...font, fontSize: "42px" })
+        .setOrigin(0.5)
+        .setDepth(2);
     }
     this.guides = this.add.graphics().setDepth(3);
     this.ink = this.add.graphics().setDepth(4);
     if (this.tracing) {
-      this.guides.lineStyle(TRACE_RADIUS * 2, 0xdbd0e3, .62).strokePoints(this.outline);
-      this.guides.lineStyle(2, INK, .45).strokePoints(this.outline);
+      this.guides.lineStyle(TRACE_RADIUS * 2, 0xdbd0e3, 0.62).strokePoints(this.outline);
+      this.guides.lineStyle(2, INK, 0.45).strokePoints(this.outline);
     } else {
       this.guides.fillStyle(0x234d59).fillEllipse(PATCH.x, PATCH.y, PATCH.rx * 2, PATCH.ry * 2);
       this.guides.lineStyle(5, INK).strokeEllipse(PATCH.x, PATCH.y, PATCH.rx * 2, PATCH.ry * 2);
@@ -106,19 +111,23 @@ export class Repair extends Phaser.Scene {
     this.drawSaved();
     this.add.text(80, 247, "Our crayons", { ...font, fontSize: "25px" }).setDepth(5);
     this.colorButtons = COLORS.map((color, i) => {
-      const button = this.add.circle(122, 310 + 78 * i, 27, color).setStrokeStyle(
-        4,
-        color === this.color ? INK : 0xfff9e9,
-      ).setDepth(5).setInteractive({ useHandCursor: true });
+      const button = this.add
+        .circle(122, 310 + 78 * i, 27, color)
+        .setStrokeStyle(4, color === this.color ? INK : 0xfff9e9)
+        .setDepth(5)
+        .setInteractive({ useHandCursor: true });
       button.on("pointerdown", (_p, _x, _y, e) => {
         e.stopPropagation();
         this.setColor(color);
       });
       return button;
     });
-    this.progressLabel = this.add.text(600, 694, "", { ...font, fontSize: "28px" }).setOrigin(.5).setDepth(6);
+    this.progressLabel = this.add
+      .text(600, 694, "", { ...font, fontSize: "28px" })
+      .setOrigin(0.5)
+      .setDepth(6);
     this.add.rectangle(600, 717, 330, 8, 0xe2d7de).setDepth(5);
-    this.progressBar = this.add.rectangle(435, 717, 0, 8, 0x497b72).setOrigin(0, .5).setDepth(6);
+    this.progressBar = this.add.rectangle(435, 717, 0, 8, 0x497b72).setOrigin(0, 0.5).setDepth(6);
     this.back = this.button(110, 763, `← ${this.returnScene}`, () => this.leave());
     if (this.tracing) {
       this.assist = this.button(
@@ -174,12 +183,16 @@ export class Repair extends Phaser.Scene {
     this.updateProgress();
   }
   button(x, y, label, action) {
-    const b = this.add.text(x, y, label, {
-      ...font,
-      fontSize: "26px",
-      backgroundColor: "#eadff4",
-      padding: { x: 20, y: 13 },
-    }).setOrigin(.5).setDepth(20).setInteractive({ useHandCursor: true });
+    const b = this.add
+      .text(x, y, label, {
+        ...font,
+        fontSize: "26px",
+        backgroundColor: "#eadff4",
+        padding: { x: 20, y: 13 },
+      })
+      .setOrigin(0.5)
+      .setDepth(20)
+      .setInteractive({ useHandCursor: true });
     b.on("pointerdown", (_p, _x, _y, event) => {
       event.stopPropagation();
       this.endStroke();
@@ -205,9 +218,9 @@ export class Repair extends Phaser.Scene {
   }
   acceptable(point) {
     return this.tracing
-      ? this.outline.slice(1).some((b, i) =>
-        distanceToSegment(point, this.outline[i], b) <= TRACE_RADIUS + 10
-      )
+      ? this.outline
+          .slice(1)
+          .some((b, i) => distanceToSegment(point, this.outline[i], b) <= TRACE_RADIUS + 10)
       : insideEllipse(point, { ...PATCH, rx: PATCH.rx + 12, ry: PATCH.ry + 12 });
   }
   startStroke(pointer) {
@@ -269,7 +282,7 @@ export class Repair extends Phaser.Scene {
           p,
           COLORS.includes(p.c) ? p.c : INK,
           this.tracing ? TRACE_WIDTH : BRUSH_RADIUS * 2,
-        )
+        ),
       );
     }
   }
@@ -280,8 +293,8 @@ export class Repair extends Phaser.Scene {
       this.kind === "bridge"
         ? "Join both ends of the rainbow"
         : this.kind === "sail"
-        ? "Give our sail all three sides"
-        : "Cover the dark spaces",
+          ? "Give our sail all three sides"
+          : "Cover the dark spaces",
     );
     if (this.coverage.complete({ strokeActive: this.pointerId !== null })) this.complete();
   }
@@ -309,9 +322,10 @@ export class Repair extends Phaser.Scene {
       return;
     }
     if (this.tapIndex > 0) {
-      const points = this.kind === "bridge"
-        ? BRIDGE.slice((this.tapIndex - 1) * 6, this.tapIndex * 6 + 1)
-        : [this.tapPoints[(this.tapIndex - 1) % 3], this.tapPoints[index]];
+      const points =
+        this.kind === "bridge"
+          ? BRIDGE.slice((this.tapIndex - 1) * 6, this.tapIndex * 6 + 1)
+          : [this.tapPoints[(this.tapIndex - 1) % 3], this.tapPoints[index]];
       const stroke = points.map((p) => ({ ...p, c: this.color }));
       this.strokes.push(stroke);
       stroke.slice(1).forEach((b, i) => {
@@ -322,7 +336,7 @@ export class Repair extends Phaser.Scene {
     this.tapIndex++;
     this.persist();
     this.updateProgress();
-    if (!this.done) this.progressLabel.setText(`Now ${this.tapIndex % this.tapPoints.length + 1}`);
+    if (!this.done) this.progressLabel.setText(`Now ${(this.tapIndex % this.tapPoints.length) + 1}`);
   }
   complete() {
     this.done = true;
@@ -332,8 +346,8 @@ export class Repair extends Phaser.Scene {
       this.kind === "bridge"
         ? "Our bridge reaches both sides!"
         : this.kind === "sail"
-        ? "Our sail is ready!"
-        : "Our patch holds!",
+          ? "Our sail is ready!"
+          : "Our patch holds!",
     );
     this.subtitle.setVisible(false);
     this.assist?.destroy();
@@ -348,14 +362,16 @@ export class Repair extends Phaser.Scene {
     );
     this.finish.setBackgroundColor("#fddf55");
     const bounds = this.finish.getBounds();
-    this.add.rectangle(bounds.centerX, bounds.centerY, bounds.width + 14, bounds.height + 14)
-      .setStrokeStyle(3, 0xe6ad24).setDepth(19);
+    this.add
+      .rectangle(bounds.centerX, bounds.centerY, bounds.width + 14, bounds.height + 14)
+      .setStrokeStyle(3, 0xe6ad24)
+      .setDepth(19);
     this.ui.speak(
       ...(this.kind === "bridge"
         ? DIALOGUE.bridgeComplete
         : this.kind === "sail"
-        ? DIALOGUE.sailComplete
-        : DIALOGUE.patchComplete)[0],
+          ? DIALOGUE.sailComplete
+          : DIALOGUE.patchComplete)[0],
     );
     this.ui.status("Ready! Keep drawing, or use the yellow button when you're finished.");
   }
@@ -369,8 +385,8 @@ export class Repair extends Phaser.Scene {
       this.kind === "bridge"
         ? DIALOGUE.bridgeDrawHint
         : this.kind === "sail"
-        ? DIALOGUE.sailHint
-        : DIALOGUE.patchHint,
+          ? DIALOGUE.sailHint
+          : DIALOGUE.patchHint,
       () => {},
       "Keep drawing",
     );

@@ -7,9 +7,7 @@ export const rotatePipe = (mask, turns = 1) => {
   return mask;
 };
 export const safeBubbles = (raw) => [
-  ...new Set(
-    Array.isArray(raw) ? raw.filter((n) => Number.isInteger(n) && n >= 0 && n < BUBBLE_COUNT) : [],
-  ),
+  ...new Set(Array.isArray(raw) ? raw.filter((n) => Number.isInteger(n) && n >= 0 && n < BUBBLE_COUNT) : []),
 ];
 const neighbors = (i) => [
   i >= 5 ? i - 5 : -1,
@@ -18,8 +16,7 @@ const neighbors = (i) => [
   i % 5 > 0 ? i - 1 : -1,
 ];
 const validCells = (cells) =>
-  Array.isArray(cells) && cells.length === 25 &&
-  cells.every((m) => Number.isInteger(m) && m > 0 && m < 16);
+  Array.isArray(cells) && cells.length === 25 && cells.every((m) => Number.isInteger(m) && m > 0 && m < 16);
 
 // Daybook's connected-network rule: matching openings, no edge leaks,
 // and all 25 tiles reachable from the source at top left.
@@ -38,16 +35,19 @@ export function waterCells(cells) {
   return seen;
 }
 export function waterConnected(cells) {
-  return validCells(cells) &&
+  return (
+    validCells(cells) &&
     cells.every((mask, i) =>
-      neighbors(i).every((j, d) => !(mask & (1 << d)) || j >= 0 && !!(cells[j] & (1 << ((d + 2) % 4))))
-    ) && waterCells(cells).size === 25;
+      neighbors(i).every((j, d) => !(mask & (1 << d)) || (j >= 0 && !!(cells[j] & (1 << ((d + 2) % 4))))),
+    ) &&
+    waterCells(cells).size === 25
+  );
 }
 
 // Seeded bank selection, reflection, rotation and independent tile scrambling,
 // adapted from Daybook's generateRatedPipes. Never roll on a scene revisit.
 export function createWaterway(seed) {
-  seed = (Number(seed) >>> 0) || 1;
+  seed = Number(seed) >>> 0 || 1;
   let state = seed;
   const random = (n) => {
     state ^= state << 13;
@@ -55,10 +55,13 @@ export function createWaterway(seed) {
     state ^= state << 5;
     return (state >>> 0) % n;
   };
-  const source = PIPE_LAYOUTS[random(PIPE_LAYOUTS.length)], turns = random(4), reflect = random(2);
+  const source = PIPE_LAYOUTS[random(PIPE_LAYOUTS.length)],
+    turns = random(4),
+    reflect = random(2);
   const solution = Array(25).fill(0);
   source.forEach((mask, i) => {
-    let r = Math.floor(i / 5), c = i % 5;
+    let r = Math.floor(i / 5),
+      c = i % 5;
     if (reflect) {
       c = 4 - c;
       mask = (mask & 5) | ((mask & 2) << 2) | ((mask & 8) >> 2);
@@ -85,9 +88,11 @@ export function restoreWaterway(raw, seed, storyDone = false) {
   const valid = raw?.version === 2 && Number.isInteger(raw.seed) && raw.seed > 0 && raw.seed <= 0xffffffff;
   const puzzle = createWaterway(valid ? raw.seed : seed);
   if (
-    valid && validCells(raw.cells) &&
+    valid &&
+    validCells(raw.cells) &&
     raw.cells.every((mask, i) => [0, 1, 2, 3].some((t) => rotatePipe(puzzle.solution[i], t) === mask))
-  ) puzzle.cells = [...raw.cells];
+  )
+    puzzle.cells = [...raw.cells];
   // Keep old partial boards intact except for anchoring the source to its inlet.
   puzzle.cells[0] = puzzle.solution[0];
   if (storyDone) puzzle.cells = [...puzzle.solution];
@@ -100,8 +105,8 @@ export function restoreWaterway(raw, seed, storyDone = false) {
 export function createWaterwayReplay(story, seed, previous) {
   let puzzle = createWaterway(seed);
   while (
-    [story, previous].some((old) =>
-      puzzle.seed === old?.seed || puzzle.solution.join() === old?.solution?.join()
+    [story, previous].some(
+      (old) => puzzle.seed === old?.seed || puzzle.solution.join() === old?.solution?.join(),
     )
   ) {
     puzzle = createWaterway(puzzle.seed + 1);

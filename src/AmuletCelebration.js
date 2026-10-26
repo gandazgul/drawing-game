@@ -1,4 +1,4 @@
-import { store } from "@caper/engine";
+import { store } from "@gandazgul/caper-engine";
 import { amuletTextures } from "./amulet-art.js";
 import { amuletComplete } from "./puzzles/amulet-climax.js";
 import { DIALOGUE } from "./dialogue.js";
@@ -11,24 +11,29 @@ function sparkles(scene, x, y, broad = false) {
   const colors = [0xffdf59, 0xff91be, 0xc3a0ff, 0xffffff, 0x8ff0d0];
   const count = reduced ? 8 : broad ? 40 : 12;
   for (let i = 0; i < count; i++) {
-    const angle = i * Math.PI * 2 / count, radius = broad ? 130 + i % 4 * 20 : 25;
-    const star = scene.add.star(
-      x + Math.cos(angle) * radius,
-      y + Math.sin(angle) * radius,
-      4,
-      2,
-      7 + i % 4 * 2,
-      colors[i % colors.length],
-    ).setDepth(45);
+    const angle = (i * Math.PI * 2) / count,
+      radius = broad ? 130 + (i % 4) * 20 : 25;
+    const star = scene.add
+      .star(
+        x + Math.cos(angle) * radius,
+        y + Math.sin(angle) * radius,
+        4,
+        2,
+        7 + (i % 4) * 2,
+        colors[i % colors.length],
+      )
+      .setDepth(45);
     star.setData("amuletSparkle", true);
     scene.tweens.add({
       targets: star,
-      ...(reduced ? {} : {
-        x: x + Math.cos(angle) * radius * 1.7,
-        y: y + Math.sin(angle) * radius * 1.5 + 35,
-        angle: i % 2 ? 90 : -90,
-        scale: .25,
-      }),
+      ...(reduced
+        ? {}
+        : {
+            x: x + Math.cos(angle) * radius * 1.7,
+            y: y + Math.sin(angle) * radius * 1.5 + 35,
+            angle: i % 2 ? 90 : -90,
+            scale: 0.25,
+          }),
       alpha: 0,
       duration: reduced ? 600 : broad ? 1800 : 750,
       ease: "Sine.easeOut",
@@ -89,26 +94,35 @@ export function playAmuletClimax(scene) {
     }
     scene.climaxPhase = "assembling";
     scene.ui.setBusy(true);
-    const veil = scene.add.rectangle(600, 400, 1200, 800, 0x172e39, .78).setDepth(30).setAlpha(0);
-    const title = scene.add.text(600, 110, "Our heart, together again", {
-      ...font,
-      fontSize: "46px",
-      color: "#fff9e9",
-    }).setOrigin(.5).setDepth(44).setAlpha(0);
+    const veil = scene.add.rectangle(600, 400, 1200, 800, 0x172e39, 0.78).setDepth(30).setAlpha(0);
+    const title = scene.add
+      .text(600, 110, "Our heart, together again", {
+        ...font,
+        fontSize: "46px",
+        color: "#fff9e9",
+      })
+      .setOrigin(0.5)
+      .setDepth(44)
+      .setAlpha(0);
     tween(veil, { alpha: 1 }, 350);
     tween(title, { alpha: 1 }, 500);
-    const positions = [{ x: 330, y: 330 }, { x: 840, y: 285 }, { x: 340, y: 520 }, { x: 850, y: 510 }];
+    const positions = [
+      { x: 330, y: 330 },
+      { x: 840, y: 285 },
+      { x: 340, y: 520 },
+      { x: 850, y: 510 },
+    ];
     const pieces = textures.map((key, i) =>
-      scene.add.image(
-        reduced ? 600 : positions[i].x,
-        reduced ? 350 : positions[i].y,
-        key,
-      ).setDepth(40 + i).setScale(reduced ? .94 : .62).setAlpha(reduced ? 0 : 1)
+      scene.add
+        .image(reduced ? 600 : positions[i].x, reduced ? 350 : positions[i].y, key)
+        .setDepth(40 + i)
+        .setScale(reduced ? 0.94 : 0.62)
+        .setAlpha(reduced ? 0 : 1),
     );
     let index = 0;
     const place = () => {
       const i = index++;
-      tween(pieces[i], { x: 600, y: 350, scale: .94, alpha: 1 }, 650, () => {
+      tween(pieces[i], { x: 600, y: 350, scale: 0.94, alpha: 1 }, 650, () => {
         sparkles(scene, 600, 365);
         if (index < pieces.length) scene.time.delayedCall(reduced ? 80 : 160, place);
         else celebrate();
@@ -138,13 +152,13 @@ export function playAmuletClimax(scene) {
           [...pieces, title, veil].forEach((o) => o.destroy());
           store.set("studioAmuletCelebrated", true);
           changeEyes();
-          sparkles(scene, scene.bounka.x, scene.bounka.y - scene.bounka.displayHeight * .65);
+          sparkles(scene, scene.bounka.x, scene.bounka.y - scene.bounka.displayHeight * 0.65);
           invite();
         };
         if (reduced) tween([...pieces, title, veil], { alpha: 0 }, 180, cleanup);
         else {
           const s = scene.walk.sprite;
-          tween(pieces, { x: s.x, y: s.y - s.displayHeight * .55, scale: .13 }, 750, () => {
+          tween(pieces, { x: s.x, y: s.y - s.displayHeight * 0.55, scale: 0.13 }, 750, () => {
             tween([...pieces, title, veil], { alpha: 0 }, 300, cleanup);
           });
         }
@@ -155,13 +169,13 @@ export function playAmuletClimax(scene) {
   const handOver = () => {
     scene.climaxPhase = "handoff";
     scene.ui.setBusy(true);
-    const giver = scene.bounka, recipient = scene.walk.sprite;
-    const gem = scene.add.image(
-      giver.x - giver.displayWidth * .32,
-      giver.y - giver.displayHeight * .42,
-      textures[3],
-    ).setScale(.85).setDepth(20);
-    const destination = { x: recipient.x + 36, y: recipient.y - recipient.displayHeight * .48 };
+    const giver = scene.bounka,
+      recipient = scene.walk.sprite;
+    const gem = scene.add
+      .image(giver.x - giver.displayWidth * 0.32, giver.y - giver.displayHeight * 0.42, textures[3])
+      .setScale(0.85)
+      .setDepth(20);
+    const destination = { x: recipient.x + 36, y: recipient.y - recipient.displayHeight * 0.48 };
     const received = () => {
       sparkles(scene, destination.x, destination.y);
       store.set("studioGemFound", true);

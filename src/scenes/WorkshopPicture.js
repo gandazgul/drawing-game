@@ -1,4 +1,4 @@
-import { store } from "@caper/engine";
+import { store } from "@gandazgul/caper-engine";
 import { PuzzleScene } from "./PuzzleScene.js";
 import { drawingInterruptions } from "../touch-input.js";
 import { distanceToSegment } from "../puzzles/geometry.js";
@@ -30,7 +30,8 @@ export class WorkshopPicture extends PuzzleScene {
       ? this.textures.get("studioPictureParts")
       : this.textures.addImage("studioPictureParts", source);
     this.pieces = PICTURE_PARTS.map((p) => {
-      const frame = `part-${p.id}`, s = p.source;
+      const frame = `part-${p.id}`,
+        s = p.source;
       if (!texture.has(frame)) {
         texture.add(
           frame,
@@ -42,21 +43,25 @@ export class WorkshopPicture extends PuzzleScene {
         );
       }
       this.add.rectangle(p.x, p.y, p.w, p.h, 0xfff9e9).setStrokeStyle(2, 0x66418d);
-      this.add.image(p.x, p.y, "studioPictureParts", frame).setDisplaySize(p.w, p.h).setAlpha(.22);
-      const fitted = this.phase === "erase" || this.placed.has(p.id), at = fitted ? p : p.home;
-      const size = fitted ? 1 : .7;
-      const image = this.add.image(at.x, at.y, "studioPictureParts", frame).setDisplaySize(
-        p.w * size,
-        p.h * size,
-      ).setDepth(3);
+      this.add.image(p.x, p.y, "studioPictureParts", frame).setDisplaySize(p.w, p.h).setAlpha(0.22);
+      const fitted = this.phase === "erase" || this.placed.has(p.id),
+        at = fitted ? p : p.home;
+      const size = fitted ? 1 : 0.7;
+      const image = this.add
+        .image(at.x, at.y, "studioPictureParts", frame)
+        .setDisplaySize(p.w * size, p.h * size)
+        .setDepth(3);
       return { ...p, image };
     });
     this.selection = this.add.graphics().setDepth(5);
     this.covers = [];
     if (this.phase === "erase") {
-      const { x, y, w, h } = PICTURE_BOX, cw = w / 16, ch = h / 14;
+      const { x, y, w, h } = PICTURE_BOX,
+        cw = w / 16,
+        ch = h / 14;
       for (let id = 0; id < 224; id++) {
-        const cx = x + (id % 16 + .5) * cw, cy = y + (Math.floor(id / 16) + .5) * ch;
+        const cx = x + ((id % 16) + 0.5) * cw,
+          cy = y + (Math.floor(id / 16) + 0.5) * ch;
         const g = this.add.graphics().setPosition(cx, cy).setDepth(6).setVisible(!this.erased.has(id));
         g.fillStyle(0xb397bb).fillRect(-cw / 2 - 1, -ch / 2 - 1, cw + 2, ch + 2);
         g.lineStyle(3, 0x7250a0).lineBetween(-cw / 2, ch / 3, cw / 2, -ch / 3);
@@ -99,8 +104,8 @@ export class WorkshopPicture extends PuzzleScene {
             targets: p.image,
             x: p.home.x,
             y: p.home.y,
-            displayWidth: p.w * .7,
-            displayHeight: p.h * .7,
+            displayWidth: p.w * 0.7,
+            displayHeight: p.h * 0.7,
             duration: reduced ? 1 : 650,
             delay: reduced ? 0 : 250 + p.id * 60,
             ease: "Cubic.Out",
@@ -179,10 +184,13 @@ export class WorkshopPicture extends PuzzleScene {
   }
   highlight(p) {
     const b = p.image.getBounds();
-    this.selection.clear().lineStyle(5, 0x66418d).strokeRect(b.x - 3, b.y - 3, b.width + 6, b.height + 6);
+    this.selection
+      .clear()
+      .lineStyle(5, 0x66418d)
+      .strokeRect(b.x - 3, b.y - 3, b.width + 6, b.height + 6);
   }
   home(p) {
-    p.image.setPosition(p.home.x, p.home.y).setDisplaySize(p.w * .7, p.h * .7);
+    p.image.setPosition(p.home.x, p.home.y).setDisplaySize(p.w * 0.7, p.h * 0.7);
   }
   place(p) {
     this.drag = null;

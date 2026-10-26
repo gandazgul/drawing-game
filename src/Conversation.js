@@ -3,9 +3,7 @@
 export const readingTime = (text) => Math.max(4500, text.trim().split(/\s+/).length * 400 + 1600);
 
 export class Conversation {
-  constructor(
-    { voice, show, schedule = (fn, ms) => setTimeout(fn, ms), cancel = (id) => clearTimeout(id) },
-  ) {
+  constructor({ voice, show, schedule = (fn, ms) => setTimeout(fn, ms), cancel = (id) => clearTimeout(id) }) {
     Object.assign(this, { voice, show, schedule, cancel });
     this.generation = 0;
   }

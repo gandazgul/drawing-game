@@ -1,4 +1,4 @@
-import { AdventureScene, store } from "@caper/engine";
+import { AdventureScene, store } from "@gandazgul/caper-engine";
 import { DIALOGUE } from "../dialogue.js";
 import { installWorldEditor } from "../WorldEditor.js";
 import { chapterForScene, enterChapter } from "../chapters.js";
@@ -12,6 +12,11 @@ export class WorldScene extends AdventureScene {
       hideCharacterSwitcher: true,
     });
   }
+  collectAssetKeys() {
+    // Caper 0.5.1 includes animation names in its image preload list. Boot has
+    // already registered these animations against the sisters' shared atlases.
+    return super.collectAssetKeys().filter((key) => !this.anims.exists(key));
+  }
   create(data) {
     enterChapter(store, this.scene.key);
     this.sceneConfig.propItems = [];
@@ -21,7 +26,7 @@ export class WorldScene extends AdventureScene {
     this.background.setDisplaySize(1200, 800);
     const spacing = this.sceneConfig.companionSpacing ?? 120;
     this.spawnCompanion({ x: this.walk.sprite.x - spacing, y: this.walk.sprite.y });
-    this.activeMarker = this.add.ellipse(0, 0, spacing / 2, spacing / 8, 0xffef9a, .9).setDepth(5);
+    this.activeMarker = this.add.ellipse(0, 0, spacing / 2, spacing / 8, 0xffef9a, 0.9).setDepth(5);
     this.events.on("update", () => {
       const sprite = this.walk?.sprite;
       if (sprite) {
@@ -36,16 +41,17 @@ export class WorldScene extends AdventureScene {
         const active = this.walk.sprite;
         const idle = this.idleCharacters[0];
         if (!idle?.sprite || idle.walker?.currentTween) return;
-        if (Math.hypot(active.x - idle.sprite.x, active.y - idle.sprite.y) >= spacing * .75) return;
+        if (Math.hypot(active.x - idle.sprite.x, active.y - idle.sprite.y) >= spacing * 0.75) return;
         const xs = this.sceneConfig.walkable.map((point) => point.x);
-        const min = Math.min(...xs), max = Math.max(...xs);
+        const min = Math.min(...xs),
+          max = Math.max(...xs);
         // Following normally maintains a gap; also make room when the player
         // walks back toward her sister, so the two paper puppets stay readable.
         const x = active.x < (min + max) / 2 ? active.x + spacing + 5 : active.x - spacing - 5;
         const target = idle.walker.snapToWalkable({ x: Math.max(min, Math.min(max, x)), y: active.y });
         // Narrow paths can snap the requested gap back onto the same spot.
         // Don't restart a walk unless it actually gives both sisters room.
-        if (Math.hypot(target.x - active.x, target.y - active.y) < spacing * .75 + 4) return;
+        if (Math.hypot(target.x - active.x, target.y - active.y) < spacing * 0.75 + 4) return;
         if (Math.hypot(target.x - idle.sprite.x, target.y - idle.sprite.y) < 4) return;
         idle.walker.walkTo(target);
       },

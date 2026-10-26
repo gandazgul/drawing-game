@@ -1,5 +1,5 @@
 import Phaser from "phaser";
-import { characters, createAdventureGame, engineAssets, store } from "@caper/engine";
+import { characters, createAdventureGame, engineAssets, store } from "@gandazgul/caper-engine";
 import { art } from "./art.js";
 import { freshState, resumeScene, SAVE_KEY } from "./state.js";
 import { GameUI } from "./ui.js";
@@ -39,7 +39,7 @@ function register() {
   store.configure({ saveKey: SAVE_KEY, saveVersion: 1, createFreshState: freshState });
   characters.register("keila", {
     spriteKey: "keila",
-    spriteScale: .36,
+    spriteScale: 0.36,
     playable: true,
     wanderer: true,
     walkSpeed: 285,
@@ -47,7 +47,7 @@ function register() {
   });
   characters.register("olivia", {
     spriteKey: "olivia",
-    spriteScale: .37,
+    spriteScale: 0.37,
     playable: true,
     wanderer: true,
     walkSpeed: 245,
@@ -83,7 +83,7 @@ class Boot extends Phaser.Scene {
     const source = this.textures.get("sisters").getSourceImage();
     ["keila", "olivia"].forEach((id, i) => {
       const texture = this.textures.addImage(`character_${id}`, source);
-      texture.get().setSize(source.width / 2, source.height, i * source.width / 2, 0);
+      texture.get().setSize(source.width / 2, source.height, (i * source.width) / 2, 0);
     });
     const blank = this.add.graphics().fillStyle(0xfff9e9).fillRect(0, 0, 1200, 100);
     blank.generateTexture("bg-inventory", 1200, 100);

@@ -1,11 +1,17 @@
-export const SAIL = [{ x: 600, y: 190 }, { x: 845, y: 480 }, { x: 600, y: 480 }, { x: 600, y: 190 }];
+export const SAIL = [
+  { x: 600, y: 190 },
+  { x: 845, y: 480 },
+  { x: 600, y: 480 },
+  { x: 600, y: 190 },
+];
 export const PATCH = { x: 600, y: 495, rx: 168, ry: 70 };
 export const TRACE_RADIUS = 12;
 export const TRACE_WIDTH = 9;
 export const BRUSH_RADIUS = 30;
 
 export function distanceToSegment(p, a, b) {
-  const dx = b.x - a.x, dy = b.y - a.y;
+  const dx = b.x - a.x,
+    dy = b.y - a.y;
   const length = dx * dx + dy * dy;
   const t = length ? Math.max(0, Math.min(1, ((p.x - a.x) * dx + (p.y - a.y) * dy) / length)) : 0;
   return Math.hypot(p.x - a.x - t * dx, p.y - a.y - t * dy);
@@ -16,8 +22,8 @@ export function traceSamples(points = SAIL, spacing = 3) {
     const a = points[edge];
     const count = Math.ceil(Math.hypot(b.x - a.x, b.y - a.y) / spacing);
     return Array.from({ length: count + 1 }, (_, i) => ({
-      x: a.x + (b.x - a.x) * i / count,
-      y: a.y + (b.y - a.y) * i / count,
+      x: a.x + ((b.x - a.x) * i) / count,
+      y: a.y + ((b.y - a.y) * i) / count,
       edge,
     }));
   });
@@ -31,9 +37,9 @@ export function patchSamples(ellipse = PATCH, spacing = 4) {
     }
   }
   // Include the perimeter too: an interior grid alone can miss an unpainted rim.
-  const count = Math.ceil(2 * Math.PI * Math.max(ellipse.rx, ellipse.ry) / spacing);
+  const count = Math.ceil((2 * Math.PI * Math.max(ellipse.rx, ellipse.ry)) / spacing);
   for (let i = 0; i < count; i++) {
-    const angle = i / count * Math.PI * 2;
+    const angle = (i / count) * Math.PI * 2;
     samples.push({
       x: ellipse.x + Math.cos(angle) * ellipse.rx,
       y: ellipse.y + Math.sin(angle) * ellipse.ry,
@@ -45,12 +51,15 @@ export function patchSamples(ellipse = PATCH, spacing = 4) {
 // Any polyline can use this, not just a three-sided sail. Sideways wobble is
 // allowed, but a stroke's ends only cover as far as its visible round brush tip.
 export function traceCoverage(points = SAIL) {
-  return new Coverage(traceSamples(points), TRACE_RADIUS, { endRadius: TRACE_WIDTH / 2, requiredRatio: .94 });
+  return new Coverage(traceSamples(points), TRACE_RADIUS, {
+    endRadius: TRACE_WIDTH / 2,
+    requiredRatio: 0.94,
+  });
 }
 
 export function patchCoverage(ellipse = PATCH) {
   // A small missed area is fine; the patch need not be perfectly filled.
-  return new Coverage(patchSamples(ellipse), BRUSH_RADIUS, { requiredRatio: .92 });
+  return new Coverage(patchSamples(ellipse), BRUSH_RADIUS, { requiredRatio: 0.92 });
 }
 
 export function insideEllipse(p, ellipse = PATCH) {
@@ -66,7 +75,8 @@ export class Coverage {
     this.hit = new Set();
   }
   stroke(a, b = a) {
-    const dx = b.x - a.x, dy = b.y - a.y;
+    const dx = b.x - a.x,
+      dy = b.y - a.y;
     const lengthSquared = dx * dx + dy * dy;
     this.samples.forEach((p, i) => {
       if (this.hit.has(i)) return;

@@ -1,4 +1,4 @@
-import { createCritters } from "@caper/engine";
+import { createCritters } from "@gandazgul/caper-engine";
 import { swimMotion, WATER_CREATURES } from "./water-creatures.js";
 
 export function swimmingCreatures(
@@ -13,8 +13,8 @@ export function swimmingCreatures(
       x,
       y,
       scale: width / scene.textures.get(art).getSourceImage().width,
-      originX: .5,
-      originY: .5,
+      originX: 0.5,
+      originY: 0.5,
       depth: 2,
       type: "custom",
       ampX: 0,

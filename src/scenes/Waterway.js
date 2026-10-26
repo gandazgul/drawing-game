@@ -1,4 +1,4 @@
-import { store } from "@caper/engine";
+import { store } from "@gandazgul/caper-engine";
 import { PuzzleScene } from "./PuzzleScene.js";
 import { font } from "../art.js";
 import { drawPipe } from "../PipeView.js";
@@ -35,22 +35,25 @@ export class Waterway extends PuzzleScene {
       ? resumeReplay
         ? restoreWaterway(store.get("waterwayReplay"), seed)
         : createWaterwayReplay(store.get("waterwayPuzzle"), seed, store.get("waterwayReplay")).puzzle
-      : waterwayProgress({
-        waterwayPuzzle: store.get("waterwayPuzzle"),
-        waterwayDone: store.get("waterwayDone"),
-      }, seed).puzzle;
+      : waterwayProgress(
+          {
+            waterwayPuzzle: store.get("waterwayPuzzle"),
+            waterwayDone: store.get("waterwayDone"),
+          },
+          seed,
+        ).puzzle;
     this.save();
     this.finish = null;
     this.returnScheduled = false;
     this.add.image(1002, 342, "bigMermaid").setDisplaySize(230, 320);
     this.add.image(1040, 570, "fish").setDisplaySize(110, 73);
-    this.add.text(177, 165, "Blue\nspring", { ...font, fontSize: "28px", align: "center" }).setOrigin(.5, 0);
-    this.add.text(866, 609, "To the\nvillage", { ...font, fontSize: "28px", align: "center" }).setOrigin(
-      .5,
-      0,
-    );
+    this.add.text(177, 165, "Blue\nspring", { ...font, fontSize: "28px", align: "center" }).setOrigin(0.5, 0);
+    this.add
+      .text(866, 609, "To the\nvillage", { ...font, fontSize: "28px", align: "center" })
+      .setOrigin(0.5, 0);
     this.tiles = this.puzzle.cells.map((_mask, i) => {
-      const x = 300 + (i % 5) * 100, y = 148 + Math.floor(i / 5) * 100;
+      const x = 300 + (i % 5) * 100,
+        y = 148 + Math.floor(i / 5) * 100;
       const tile = this.add.rectangle(x + 50, y + 50, 96, 96, 0xe4ede5).setStrokeStyle(2, 0x97aaa1);
       if (i !== 0) tile.setInteractive({ useHandCursor: true });
       const g = this.add.graphics().setDepth(1);
@@ -91,9 +94,8 @@ export class Waterway extends PuzzleScene {
       if (!this.replay) {
         if (!this.returnScheduled) {
           this.returnScheduled = true;
-          this.time.delayedCall(
-            this.registry.get("reducedMotion") ? 200 : 650,
-            () => this.scene.start("Underwater"),
+          this.time.delayedCall(this.registry.get("reducedMotion") ? 200 : 650, () =>
+            this.scene.start("Underwater"),
           );
         }
         return;

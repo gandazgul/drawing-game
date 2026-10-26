@@ -4,7 +4,7 @@ export function ringPartyBell(scene, bell) {
   scene.tweens.killTweensOf(bell);
   bell.setAngle(0).setAlpha(1);
   if (scene.registry.get("reducedMotion")) {
-    return scene.tweens.add({ targets: bell, alpha: .65, duration: 160, yoyo: true });
+    return scene.tweens.add({ targets: bell, alpha: 0.65, duration: 160, yoyo: true });
   }
   return scene.tweens.chain({
     targets: bell,

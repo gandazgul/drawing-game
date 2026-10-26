@@ -1,5 +1,5 @@
 import Phaser from "phaser";
-import { store } from "@caper/engine";
+import { store } from "@gandazgul/caper-engine";
 import { PuzzleScene } from "./PuzzleScene.js";
 import { COLORS, font } from "../art.js";
 import { drawing } from "../DrawnWorld.js";
@@ -34,7 +34,7 @@ function memoryPaper(scene) {
   ctx.fillStyle = "#ece5d5";
   ctx.fill();
   ctx.strokeStyle = "#cec4ae";
-  ctx.lineWidth = .7;
+  ctx.lineWidth = 0.7;
   ctx.stroke();
   texture.refresh();
   return key;
@@ -59,18 +59,21 @@ export class PictureMemory extends PuzzleScene {
     const deck = Phaser.Utils.Array.Shuffle([...MEMORY_ART, ...MEMORY_ART]);
     const paper = memoryPaper(this);
     this.cards = deck.map((key, i) => {
-      const x = 327 + i % 4 * 182, y = 211 + Math.floor(i / 4) * 121;
+      const x = 327 + (i % 4) * 182,
+        y = 211 + Math.floor(i / 4) * 121;
       const card = this.add.container(x, y);
-      card.setAngle([-1.3, .8, -.6, 1.1][i % 4]);
+      card.setAngle([-1.3, 0.8, -0.6, 1.1][i % 4]);
       const face = this.add.image(0, 0, paper);
       const image = this.add.image(-3, 0, key);
       image.setScale(Math.min(128 / image.width, 83 / image.height));
       const back = this.add.image(0, 0, paper);
-      const mark = this.add.text(0, 0, "?", {
-        ...font,
-        fontSize: "32px",
-        color: "#756954",
-      }).setOrigin(.5);
+      const mark = this.add
+        .text(0, 0, "?", {
+          ...font,
+          fontSize: "32px",
+          color: "#756954",
+        })
+        .setOrigin(0.5);
       const matchedMark = this.add.graphics().setVisible(false);
       matchedMark.lineStyle(3, 0x45954f).strokePoints([
         { x: 58, y: 36 },
@@ -130,10 +133,12 @@ export class PictureMemory extends PuzzleScene {
         );
         [first, card].forEach((c) => c.matchedMark.setVisible(true));
         this.waiting = false;
-      } else {this.time.delayedCall(800, () => {
+      } else {
+        this.time.delayedCall(800, () => {
           this.flip(first, false);
-          this.flip(card, false, () => this.waiting = false);
-        });}
+          this.flip(card, false, () => (this.waiting = false));
+        });
+      }
     });
   }
   hint() {
@@ -154,15 +159,20 @@ export class JumpRope extends PuzzleScene {
       "Village",
     );
     this.add.image(600, 410, "villageBackdrop").setDisplaySize(1200, 800).setDepth(-3);
-    this.add.rectangle(600, 70, 1200, 140, 0xfff9e9, .93).setDepth(-2);
-    this.add.ellipse(600, 582, 270, 38, 0x4b7156, .17);
+    this.add.rectangle(600, 70, 1200, 140, 0xfff9e9, 0.93).setDepth(-2);
+    this.add.ellipse(600, 582, 270, 38, 0x4b7156, 0.17);
     this.backRope = this.add.graphics().setDepth(1);
     const active = store.getActiveCharacter();
-    this.jumper = this.add.image(600, 578, `character_${active}`).setOrigin(.5, 1).setScale(.29).setDepth(3);
-    this.turner = this.add.image(302, 578, `character_${active === "keila" ? "olivia" : "keila"}`).setOrigin(
-      .5,
-      1,
-    ).setScale(.28).setDepth(3);
+    this.jumper = this.add
+      .image(600, 578, `character_${active}`)
+      .setOrigin(0.5, 1)
+      .setScale(0.29)
+      .setDepth(3);
+    this.turner = this.add
+      .image(302, 578, `character_${active === "keila" ? "olivia" : "keila"}`)
+      .setOrigin(0.5, 1)
+      .setScale(0.28)
+      .setDepth(3);
     drawing(this, "blueCat", 927, 578, 160, 3);
     this.frontRope = this.add.graphics().setDepth(4);
     this.jumpButton = this.button(600, 751, "Start jumping", () => this.jump(), "#d2e9c8");
@@ -217,7 +227,7 @@ export class JumpRope extends PuzzleScene {
       }
     }
     const previous = (this.angle - Math.PI / 2 + Math.PI * 2) % (Math.PI * 2);
-    this.angle = (this.angle + .0028 * (1 + Math.min(this.score, 15) * .016) * dt) % (Math.PI * 2);
+    this.angle = (this.angle + 0.0028 * (1 + Math.min(this.score, 15) * 0.016) * dt) % (Math.PI * 2);
     const now = (this.angle - Math.PI / 2 + Math.PI * 2) % (Math.PI * 2);
     if (now < previous) {
       if (this.jumpTime >= 100 && this.jumpTime <= 800) {

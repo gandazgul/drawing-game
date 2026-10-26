@@ -1,4 +1,4 @@
-import { store } from "@caper/engine";
+import { store } from "@gandazgul/caper-engine";
 import { COLORS, drawHeart, font, line } from "../art.js";
 import { PuzzleScene } from "./PuzzleScene.js";
 import { drawing } from "../DrawnWorld.js";
@@ -34,9 +34,12 @@ export const GARDEN_PATH = [
   { x: 680, y: 250 },
   { x: 980, y: 250 },
 ];
-export const CAKE_PATHS = [545, 600, 655].map((
-  x,
-) => [{ x, y: 340 }, { x, y: 230 }, { x: x + 22, y: 230 }, { x: x + 22, y: 340 }]);
+export const CAKE_PATHS = [545, 600, 655].map((x) => [
+  { x, y: 340 },
+  { x, y: 230 },
+  { x: x + 22, y: 230 },
+  { x: x + 22, y: 340 },
+]);
 
 export class VillagePuzzle extends PuzzleScene {
   constructor() {
@@ -58,13 +61,17 @@ export class VillagePuzzle extends PuzzleScene {
     this.replayKey = `villageReplay_${this.id}`;
     this.replayState = null;
     if (this.replay) {
-      this.replayState = this.id === "box"
-        ? boxSession(store.get(this.replayKey))
-        : this.id === "rooms"
-        ? jigsawSession(store.get(this.replayKey))
-        : buntingSession(
-          store.get(this.replayKey) ?? { patterns: store.get("village_bunting_layout"), complete: true },
-        );
+      this.replayState =
+        this.id === "box"
+          ? boxSession(store.get(this.replayKey))
+          : this.id === "rooms"
+            ? jigsawSession(store.get(this.replayKey))
+            : buntingSession(
+                store.get(this.replayKey) ?? {
+                  patterns: store.get("village_bunting_layout"),
+                  complete: true,
+                },
+              );
       store.set(this.replayKey, this.replayState);
     }
     this.setup(
@@ -81,7 +88,7 @@ export class VillagePuzzle extends PuzzleScene {
     );
     this.ready = !this.replay && tasks().includes(this.id);
     this.finishButton = this.button(957, 751, "Keep going…", () => this.finish());
-    this.finishButton.setAlpha(.45);
+    this.finishButton.setAlpha(0.45);
     this[task.kind]();
     if (this.ready) this.setReady();
     if (this.ui.readAloud) this.ui.voice.play("A little idea", task.instruction);
@@ -115,14 +122,16 @@ export class VillagePuzzle extends PuzzleScene {
     const paths = this.id === "garden" ? [GARDEN_PATH] : CAKE_PATHS;
     if (this.id === "garden") {
       drawing(this, "bee", 155, 552, 95);
-      [[440, 330, "flowerBlue"], [680, 530, "sunflower"], [1010, 320, "birthdayFlowers"]].forEach((
-        [x, y, key],
-      ) => drawing(this, key, x, y, 105));
+      [
+        [440, 330, "flowerBlue"],
+        [680, 530, "sunflower"],
+        [1010, 320, "birthdayFlowers"],
+      ].forEach(([x, y, key]) => drawing(this, key, x, y, 105));
     } else cakeBody(this, 600, 635, 280);
     const guide = this.add.graphics().setDepth(3);
-    paths.forEach((path) => guide.lineStyle(24, 0x7250a0, .18).strokePoints(path));
+    paths.forEach((path) => guide.lineStyle(24, 0x7250a0, 0.18).strokePoints(path));
     const samples = paths.flatMap((path) => traceSamples(path));
-    this.coverage = new Coverage(samples, 16, { endRadius: 10, requiredRatio: .84 });
+    this.coverage = new Coverage(samples, 16, { endRadius: 10, requiredRatio: 0.84 });
     this.strokes = validStrokes(this.savedData([]));
     this.ink = this.add.graphics().setDepth(4);
     this.strokes.forEach((stroke) => {
@@ -145,12 +154,13 @@ export class VillagePuzzle extends PuzzleScene {
     });
     this.input.on("pointermove", (p) => {
       if (!stroke || !p.isDown || this.blocked || !valid(p)) return;
-      const a = stroke.at(-1), b = point(p);
+      const a = stroke.at(-1),
+        b = point(p);
       line(this.ink, a, b, store.getActiveCharacter() === "keila" ? COLORS[1] : COLORS[0], 8);
       this.coverage.stroke(a, b);
       stroke.push(b);
-      this.feedback.setText(`${Math.min(100, Math.round(this.coverage.ratio / .84 * 100))}%`);
-      if (this.coverage.ratio >= .84) this.setReady();
+      this.feedback.setText(`${Math.min(100, Math.round((this.coverage.ratio / 0.84) * 100))}%`);
+      if (this.coverage.ratio >= 0.84) this.setReady();
     });
     const end = () => {
       if (stroke) {
@@ -160,18 +170,20 @@ export class VillagePuzzle extends PuzzleScene {
     };
     this.input.on("pointerup", end);
     this.input.on("pointerupoutside", end);
-    if (this.coverage.ratio >= .84) this.setReady();
+    if (this.coverage.ratio >= 0.84) this.setReady();
   }
   sort() {
     const raw = this.savedData([]);
     this.sorted = Array.isArray(raw) ? raw.filter((v) => Number.isInteger(v) && v >= 0 && v < 5) : [];
-    this.add.text(600, 185, "Smallest                                      Biggest", {
-      ...font,
-      fontSize: "26px",
-    }).setOrigin(.5);
+    this.add
+      .text(600, 185, "Smallest                                      Biggest", {
+        ...font,
+        fontSize: "26px",
+      })
+      .setOrigin(0.5);
     [0, 1, 2, 3, 4].forEach((id) => {
       const x = 250 + id * 175;
-      this.add.rectangle(x, 465, 151, 7, 0x7250a0, .6);
+      this.add.rectangle(x, 465, 151, 7, 0x7250a0, 0.6);
       const img = drawing(
         this,
         "mouse",
@@ -204,17 +216,19 @@ export class VillagePuzzle extends PuzzleScene {
     this.patterns = this.replay
       ? this.replayState.patterns
       : validPatterns(savedLayout)
-      ? savedLayout
-      : Array.isArray(raw) && raw.some((n) => Number.isInteger(n))
-      ? LEGACY_PATTERNS
-      : newPatterns();
+        ? savedLayout
+        : Array.isArray(raw) && raw.some((n) => Number.isInteger(n))
+          ? LEGACY_PATTERNS
+          : newPatterns();
     if (!this.replay) store.set("village_bunting_layout", this.patterns);
     this.answers = validAnswers(raw);
     this.paint = 0;
     this.swatches = [];
     this.tiles = [];
     COLORS.forEach((color, i) => {
-      const b = this.add.circle(270 + i * 165, 606, 31, color).setStrokeStyle(i === 0 ? 5 : 1, 0x513272)
+      const b = this.add
+        .circle(270 + i * 165, 606, 31, color)
+        .setStrokeStyle(i === 0 ? 5 : 1, 0x513272)
         .setInteractive({ useHandCursor: true });
       b.on("pointerdown", () => {
         this.paint = i;
@@ -224,12 +238,13 @@ export class VillagePuzzle extends PuzzleScene {
     });
     this.patterns.forEach((row, r) =>
       row.forEach((color, c) => {
-        const x = 230 + c * 147, y = 220 + r * 125, idx = r * 3 + c - 3;
+        const x = 230 + c * 147,
+          y = 220 + r * 125,
+          idx = r * 3 + c - 3;
         const fill = c < 3 ? COLORS[color] : COLORS[this.answers[idx]];
-        const triangle = this.add.triangle(x, y, 0, 0, 104, 0, 52, 80, fill ?? 0xfff9e9).setStrokeStyle(
-          3,
-          0x513272,
-        );
+        const triangle = this.add
+          .triangle(x, y, 0, 0, 104, 0, 52, 80, fill ?? 0xfff9e9)
+          .setStrokeStyle(3, 0x513272);
         if (c >= 3) {
           triangle.setInteractive({ useHandCursor: true }).on("pointerdown", () => {
             this.answers[idx] = this.paint;
@@ -238,7 +253,7 @@ export class VillagePuzzle extends PuzzleScene {
             this.checkPattern();
           });
         }
-      })
+      }),
     );
     this.checkPattern();
   }
@@ -247,7 +262,7 @@ export class VillagePuzzle extends PuzzleScene {
       this.setReady();
     } else {
       this.ready = false;
-      this.finishButton.setAlpha(.45).setText("Keep going…");
+      this.finishButton.setAlpha(0.45).setText("Keep going…");
       this.feedback.setText("Copy the repeating colors into the empty flags.");
     }
   }
@@ -258,10 +273,9 @@ export class VillagePuzzle extends PuzzleScene {
     const savedTarget = store.get("village_music_target");
     this.musicTarget = MUSIC_TARGETS.includes(savedTarget) ? savedTarget : nextMusicTarget();
     store.set("village_music_target", this.musicTarget);
-    this.musicPatch = this.add.rectangle(this.musicTarget, 400, 145, 46, 0x80bb82).setStrokeStyle(
-      3,
-      0x45954f,
-    );
+    this.musicPatch = this.add
+      .rectangle(this.musicTarget, 400, 145, 46, 0x80bb82)
+      .setStrokeStyle(3, 0x45954f);
     this.hits = musicHits(this.savedData(0));
     this.musicResolving = false;
     this.note = this.add.graphics().setPosition(315, 400).setDepth(5).setName("music-note");
@@ -279,7 +293,11 @@ export class VillagePuzzle extends PuzzleScene {
   }
   resetMusicNote() {
     this.beat = this.musicTarget > 600 ? -Math.PI / 2 : Math.PI / 2;
-    this.note.setPosition(600 + Math.sin(this.beat) * 285, 400).setScale(1).setAlpha(1).setAngle(0);
+    this.note
+      .setPosition(600 + Math.sin(this.beat) * 285, 400)
+      .setScale(1)
+      .setAlpha(1)
+      .setAngle(0);
     paintMusicNote(this.note, 0x513272, this.hits % 2 === 1);
   }
   hit() {
@@ -312,11 +330,11 @@ export class VillagePuzzle extends PuzzleScene {
       this.save(this.hits);
       this.feedback.setText(`${this.hits} / 5 notes`);
       if (store.get("effectsOn") !== false) {
-        this.sound.play("bubblePop", { volume: .24, rate: 1 + this.hits * .1 });
+        this.sound.play("bubblePop", { volume: 0.24, rate: 1 + this.hits * 0.1 });
       }
       this.tweens.add({
         targets: this.note,
-        ...(reduced ? {} : { x: this.note.x + 120, y: 210, angle: -20, scaleX: .7, scaleY: .7 }),
+        ...(reduced ? {} : { x: this.note.x + 120, y: 210, angle: -20, scaleX: 0.7, scaleY: 0.7 }),
         alpha: 0,
         duration: reduced ? 180 : 550,
         ease: "Cubic.easeOut",
@@ -330,31 +348,35 @@ export class VillagePuzzle extends PuzzleScene {
   }
   update(_time, delta) {
     if (this.id === "music" && this.note && !this.blocked && !this.musicResolving && !this.ready) {
-      this.beat += Math.min(delta, 40) * .0018;
+      this.beat += Math.min(delta, 40) * 0.0018;
       this.note.x = 600 + Math.sin(this.beat) * 285;
     }
   }
   slide() {
     const raw = this.savedData(BOX_START);
-    this.board = Array.isArray(raw) && raw.length === 6 && new Set(raw).size === 6 &&
-        raw.every((v) => Number.isInteger(v) && v >= 0 && v < 6)
-      ? raw
-      : [...BOX_START];
+    this.board =
+      Array.isArray(raw) &&
+      raw.length === 6 &&
+      new Set(raw).size === 6 &&
+      raw.every((v) => Number.isInteger(v) && v >= 0 && v < 6)
+        ? raw
+        : [...BOX_START];
     this.tiles = [];
     const preview = this.add.image(1010, 325, "blueCat");
     preview.setScale(Math.min(215 / preview.width, 235 / preview.height));
-    this.add.text(1010, 500, "The finished picture", { ...font, fontSize: "24px" }).setOrigin(.5);
+    this.add.text(1010, 500, "The finished picture", { ...font, fontSize: "24px" }).setOrigin(0.5);
     const source = this.textures.get("blueCat").getSourceImage();
     for (let n = 1; n <= 5; n++) {
       const key = `box-tile-${n}`;
       if (!this.textures.exists(key)) {
-        const t = this.textures.createCanvas(key, 180, 195), c = t.getContext();
+        const t = this.textures.createCanvas(key, 180, 195),
+          c = t.getContext();
         c.fillStyle = "#f9e9bf";
         c.fillRect(0, 0, 180, 195);
         c.drawImage(
           source,
-          (n - 1) % 3 * source.width / 3,
-          Math.floor((n - 1) / 3) * source.height / 2,
+          (((n - 1) % 3) * source.width) / 3,
+          (Math.floor((n - 1) / 3) * source.height) / 2,
           source.width / 3,
           source.height / 2,
           0,
@@ -381,7 +403,7 @@ export class VillagePuzzle extends PuzzleScene {
   }
   layoutTiles() {
     this.board.forEach((n, i) => {
-      if (n) this.tiles[n].setPosition(285 + i % 3 * 186, 285 + Math.floor(i / 3) * 201);
+      if (n) this.tiles[n].setPosition(285 + (i % 3) * 186, 285 + Math.floor(i / 3) * 201);
     });
     if (this.board.every((n, i) => n === BOX_GOAL[i])) {
       this.setReady();
@@ -409,7 +431,7 @@ export class VillagePuzzle extends PuzzleScene {
     );
     const previewKey = `inn-jigsaw-preview-${this.pictureKey}`;
     if (!this.textures.exists(previewKey)) this.textures.addCanvas(previewKey, scaled);
-    this.add.image(360, 390, previewKey).setAlpha(.18);
+    this.add.image(360, 390, previewKey).setAlpha(0.18);
     this.add.rectangle(360, 390, 600, 400).setStrokeStyle(3, 0x7250a0);
     for (let i = 0; i < 25; i++) {
       const col = i % 5,
@@ -419,7 +441,8 @@ export class VillagePuzzle extends PuzzleScene {
         w = 120,
         h = 80;
       if (!this.textures.exists(key)) {
-        const t = this.textures.createCanvas(key, w + pad * 2, h + pad * 2), ctx = t.getContext();
+        const t = this.textures.createCanvas(key, w + pad * 2, h + pad * 2),
+          ctx = t.getContext();
         ctx.beginPath();
         ctx.moveTo(pad, pad);
         edge(ctx, pad, pad, pad + w, pad, row === 0 ? 0 : -1);
@@ -438,13 +461,12 @@ export class VillagePuzzle extends PuzzleScene {
       }
       const target = { x: 120 + col * w, y: 230 + row * h };
       // A deterministic shuffled tray remains stable when returning to this puzzle.
-      const position = this.replay ? this.replayState.order.indexOf(i) : i * 7 % 25,
-        home = { x: 744 + position % 5 * 90, y: 205 + Math.floor(position / 5) * 89 };
-      const piece = this.add.image(
-        this.placed.has(i) ? target.x : home.x,
-        this.placed.has(i) ? target.y : home.y,
-        key,
-      ).setScale(this.placed.has(i) ? 1 : .58).setDepth(4);
+      const position = this.replay ? this.replayState.order.indexOf(i) : (i * 7) % 25,
+        home = { x: 744 + (position % 5) * 90, y: 205 + Math.floor(position / 5) * 89 };
+      const piece = this.add
+        .image(this.placed.has(i) ? target.x : home.x, this.placed.has(i) ? target.y : home.y, key)
+        .setScale(this.placed.has(i) ? 1 : 0.58)
+        .setDepth(4);
       if (this.placed.has(i)) continue;
       piece.setInteractive({ useHandCursor: true });
       this.input.setDraggable(piece);
@@ -457,7 +479,7 @@ export class VillagePuzzle extends PuzzleScene {
           this.save([...this.placed]);
           this.feedback.setText(`${this.placed.size} / 25 pieces`);
           if (this.placed.size === 25) this.setReady();
-        } else piece.setPosition(home.x, home.y).setScale(.58).setDepth(4);
+        } else piece.setPosition(home.x, home.y).setScale(0.58).setDepth(4);
       });
     }
     this.feedback.setText(`${this.placed.size} / 25 pieces`);
@@ -484,8 +506,8 @@ function edge(ctx, x1, y1, x2, y2, type) {
     ctx.lineTo(x2, y2);
     return;
   }
-  ctx.lineTo(...p(.35));
-  ctx.bezierCurveTo(...p(.35, -h * .1), ...p(.35, h), ...p(.5, h));
-  ctx.bezierCurveTo(...p(.65, h), ...p(.65, -h * .1), ...p(.65));
+  ctx.lineTo(...p(0.35));
+  ctx.bezierCurveTo(...p(0.35, -h * 0.1), ...p(0.35, h), ...p(0.5, h));
+  ctx.bezierCurveTo(...p(0.65, h), ...p(0.65, -h * 0.1), ...p(0.65));
   ctx.lineTo(x2, y2);
 }

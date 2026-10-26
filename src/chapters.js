@@ -55,8 +55,10 @@ export const CHAPTERS = {
   },
 };
 export function chapterForScene(scene, fallback = "chapter1") {
-  return Object.keys(CHAPTERS).find((id) => CHAPTERS[id].scenes.includes(scene)) ??
-    (CHAPTERS[fallback] ? fallback : "chapter1");
+  return (
+    Object.keys(CHAPTERS).find((id) => CHAPTERS[id].scenes.includes(scene)) ??
+    (CHAPTERS[fallback] ? fallback : "chapter1")
+  );
 }
 export function enterChapter(store, scene) {
   const id = chapterForScene(scene, store.get("chapter"));
@@ -94,22 +96,23 @@ const villageKeys = new Set([
 export function keyChapter(key) {
   if (harborKeys.has(key)) return "chapter1";
   if (villageKeys.has(key) || /^(village|snow)/.test(key)) return "chapter2";
-  if (/^forest/.test(key)) return "chapter3";
-  if (/^studio/.test(key)) return "chapter4";
-  if (/^ending/.test(key)) return "chapter5";
+  if (key.startsWith("forest")) return "chapter3";
+  if (key.startsWith("studio")) return "chapter4";
+  if (key.startsWith("ending")) return "chapter5";
   return null;
 }
 export function chapterResetState(state, id) {
   const chapter = CHAPTERS[id];
   if (!chapter?.start) throw Error("This chapter has no playable starting scene yet.");
-  const result = structuredClone(state), defaults = freshState().values;
+  const result = structuredClone(state),
+    defaults = freshState().values;
   for (const key of Object.keys(result.values)) if (keyChapter(key) === id) delete result.values[key];
   for (const [key, value] of Object.entries(defaults)) if (keyChapter(key) === id) result.values[key] = value;
   result.values.chapter = id;
   result.values.currentScene = chapter.start;
   const removed = new Set(STICKERS.filter((s) => chapterForScene(s.scene) === id).map((s) => s.id));
   result.collections.stickers = new Set(
-    [...result.collections.stickers ?? []].filter((s) => !removed.has(s)),
+    [...(result.collections.stickers ?? [])].filter((s) => !removed.has(s)),
   );
   return result;
 }

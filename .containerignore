@@ -1,6 +1,8 @@
 *
 !Containerfile
-!server.lock
+!package.json
+!pnpm-lock.yaml
+!pnpm-workspace.yaml
 !dist/
 !dist/**
 !src/

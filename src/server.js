@@ -1,40 +1,46 @@
-// The container runs this standalone, without the game's local Caper import map.
-// deno-lint-ignore no-import-prefix
-import { serveDir } from "jsr:@std/http@1.0.21/file-server";
+import { createServer } from "node:http";
+import { fileURLToPath } from "node:url";
+import sirv from "sirv";
 
 // Only the production bundle is served. No authentication or live TTS calls.
-export async function handleRequest(request) {
-  if (!["GET", "HEAD"].includes(request.method)) {
-    return new Response("Method not allowed", { status: 405, headers: { Allow: "GET, HEAD" } });
-  }
-  const path = new URL(request.url).pathname;
-  if (path === "/healthz") {
-    return new Response(request.method === "HEAD" ? null : "ok", {
-      headers: { "Content-Type": "text/plain", "Cache-Control": "no-store" },
-    });
-  }
-  const fileRequest = request.method === "HEAD" ? new Request(request, { method: "GET" }) : request;
-  const response = await serveDir(fileRequest, {
-    fsRoot: "dist",
-    showDirListing: false,
-    showDotfiles: false,
-    quiet: true,
+export function createStaticServer(root = fileURLToPath(new URL("../dist/", import.meta.url))) {
+  const serve = sirv(root, {
+    etag: true,
+    dotfiles: false,
+    single: false,
+    setHeaders(response, path) {
+      response.setHeader(
+        "Cache-Control",
+        /^\/assets\/.+-[\w-]{8,}\.[\w]+$/.test(path) ? "public, max-age=31536000, immutable" : "no-cache",
+      );
+    },
   });
-  response.headers.set("X-Content-Type-Options", "nosniff");
-  response.headers.set("Referrer-Policy", "same-origin");
-  response.headers.set(
-    "Cache-Control",
-    response.ok && /^\/assets\/.+-[\w-]{8,}\.[\w]+$/.test(path)
-      ? "public, max-age=31536000, immutable"
-      : "no-cache",
-  );
-  if (request.method === "HEAD") {
-    await response.body?.cancel();
-    return new Response(null, response);
-  }
-  return response;
+  return createServer((request, response) => {
+    response.setHeader("X-Content-Type-Options", "nosniff");
+    response.setHeader("Referrer-Policy", "same-origin");
+    response.setHeader("Cache-Control", "no-cache");
+    if (!["GET", "HEAD"].includes(request.method)) {
+      response.writeHead(405, { Allow: "GET, HEAD" });
+      response.end("Method not allowed");
+      return;
+    }
+    if (request.url.split("?", 1)[0] === "/healthz") {
+      response.writeHead(200, { "Content-Type": "text/plain", "Cache-Control": "no-store" });
+      response.end(request.method === "HEAD" ? undefined : "ok");
+      return;
+    }
+    serve(request, response, () => {
+      response.writeHead(404, { "Content-Type": "text/plain" });
+      response.end("Not found");
+    });
+  });
 }
 
 if (import.meta.main) {
-  Deno.serve({ hostname: "0.0.0.0", port: Number(Deno.env.get("PORT") || 8080) }, handleRequest);
+  const port = Number(process.env.PORT || 8080);
+  const server = createStaticServer();
+  server.listen(port, "0.0.0.0", () => console.log(`Serving dist on port ${port}`));
+  for (const signal of ["SIGINT", "SIGTERM"]) {
+    process.once(signal, () => server.close());
+  }
 }

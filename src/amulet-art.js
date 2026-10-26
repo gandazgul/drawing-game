@@ -13,16 +13,16 @@ export const AMULET_PARTS = [
   },
   { color: "#26798c", path: "M80 89 68 77q-6-13 12-2 18-11 12 2Z", className: "missing" },
 ];
-export const amuletSVG =
-  `<svg class="heart-display" role="img" viewBox="0 0 160 160" aria-label="Outer heart frame, two missing heart rings and a missing center gem">${
-    AMULET_PARTS.map((p) => `<path class="${p.className}" d="${p.path}"/>`).join("")
-  }</svg>`;
+export const amuletSVG = `<svg class="heart-display" role="img" viewBox="0 0 160 160" aria-label="Outer heart frame, two missing heart rings and a missing center gem">${AMULET_PARTS.map(
+  (p) => `<path class="${p.className}" d="${p.path}"/>`,
+).join("")}</svg>`;
 
 export function amuletTextures(scene) {
   return AMULET_PARTS.map((part, i) => {
     const key = `amulet-part-${i}`;
     if (scene.textures.exists(key)) return key;
-    const t = scene.textures.createCanvas(key, 480, 480), ctx = t.getContext();
+    const t = scene.textures.createCanvas(key, 480, 480),
+      ctx = t.getContext();
     ctx.scale(3, 3);
     const path = new Path2D(part.path);
     ctx.lineJoin = "round";

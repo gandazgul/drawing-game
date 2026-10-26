@@ -1,11 +1,9 @@
 const KEY = "drawing-world-layouts-v1";
 const point = (p) =>
-  p && Number.isFinite(p.x) && Number.isFinite(p.y) &&
-  p.x >= 0 && p.x <= 1200 && p.y >= 0 && p.y <= 800;
+  p && Number.isFinite(p.x) && Number.isFinite(p.y) && p.x >= 0 && p.x <= 1200 && p.y >= 0 && p.y <= 800;
 const polygon = (p) => Array.isArray(p) && p.length >= 3 && p.length <= 100 && p.every(point);
 const bounds = (b) =>
-  point(b) && Number.isFinite(b.w) && Number.isFinite(b.h) &&
-  b.w > 0 && b.h > 0 && b.w <= 1200 && b.h <= 800;
+  point(b) && Number.isFinite(b.w) && Number.isFinite(b.h) && b.w > 0 && b.h > 0 && b.w <= 1200 && b.h <= 800;
 
 function layouts() {
   try {
@@ -56,11 +54,14 @@ function snapshot(scene) {
     scene: scene.layoutKey,
     walkable: scene.sceneConfig.walkable,
     props: scene.sceneConfig.propItems,
-    hotspots: scene.hotspots.list().filter((h) => !h.data?.npc).map((h) => ({
-      id: h.id,
-      bounds: h.bounds,
-      approachPoint: h.approachPoint,
-    })),
+    hotspots: scene.hotspots
+      .list()
+      .filter((h) => !h.data?.npc)
+      .map((h) => ({
+        id: h.id,
+        bounds: h.bounds,
+        approachPoint: h.approachPoint,
+      })),
     critters: (scene.critterEntries ?? []).map(({ spec }) => ({
       x: spec.x,
       y: spec.y,
@@ -83,7 +84,8 @@ function restore(scene, saved) {
     if (!from) continue;
     if (bounds(from.bounds)) {
       Object.assign(h.bounds, from.bounds);
-      const b = h.bounds, zone = scene.hotspots.zones.get(h.id);
+      const b = h.bounds,
+        zone = scene.hotspots.zones.get(h.id);
       zone.setPosition(b.x, b.y).setSize(b.w, b.h);
       zone.input.hitArea.setSize(b.w, b.h);
     }

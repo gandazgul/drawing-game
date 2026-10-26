@@ -1,7 +1,8 @@
 // Fullscreen must be requested synchronously from the user's button click.
 // Keep a visible, reversible large-view fallback if the browser denies it.
 export function installFullscreen({ button, target, notice, doc = document }) {
-  let fallback = false, pending = false;
+  let fallback = false,
+    pending = false;
   const update = () => {
     const native = Boolean(doc.fullscreenElement);
     target.classList.toggle("large-view", native || fallback);

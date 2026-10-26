@@ -4,14 +4,21 @@ import { bubbleSparkles } from "./BubbleSparkles.js";
 // Inspired by Bears BathScene: distinct floating and floor states. Here some
 // bubbles first fall to the floor, squash on contact, then gently settle there.
 export function bubbleTarget(scene, id, onPop, placement) {
-  const positions = [[355, 225], [445, 280], [455, 195], [555, 310], [385, 465], [655, 400], [755, 220], [
-    900,
-    370,
-  ]];
-  const [x, y] = placement ? [placement.x, placement.y] : positions[id], r = 43;
+  const positions = [
+    [355, 225],
+    [445, 280],
+    [455, 195],
+    [555, 310],
+    [385, 465],
+    [655, 400],
+    [755, 220],
+    [900, 370],
+  ];
+  const [x, y] = placement ? [placement.x, placement.y] : positions[id],
+    r = 43;
   const root = scene.add.container(x, y).setDepth(14);
-  const circle = scene.add.circle(0, 0, r, 0xc8f4fa, .65).setStrokeStyle(4, 0x356986);
-  const gleam = scene.add.arc(-8, -8, 25, 195, 275, false).setStrokeStyle(5, 0xffffff, .95);
+  const circle = scene.add.circle(0, 0, r, 0xc8f4fa, 0.65).setStrokeStyle(4, 0x356986);
+  const gleam = scene.add.arc(-8, -8, 25, 195, 275, false).setStrokeStyle(5, 0xffffff, 0.95);
   root.add([circle, gleam]);
   circle.setInteractive({ useHandCursor: true });
   let popped = false;
@@ -24,7 +31,7 @@ export function bubbleTarget(scene, id, onPop, placement) {
       scene.tweens.add({
         targets: root,
         scaleX: 1.12,
-        scaleY: .83,
+        scaleY: 0.83,
         duration: 600,
         ease: "Sine.inOut",
         yoyo: true,
@@ -61,7 +68,7 @@ export function bubbleTarget(scene, id, onPop, placement) {
     circle.disableInteractive();
     scene.tweens.killTweensOf(root);
     if (scene.ui.effectsOn && scene.cache.audio.exists("bubblePop")) {
-      scene.sound.play("bubblePop", { volume: .4, rate: 1 + id * .025 });
+      scene.sound.play("bubblePop", { volume: 0.4, rate: 1 + id * 0.025 });
     }
     onPop(id);
     bubbleSparkles(scene, root.x, root.y, id);
@@ -69,9 +76,10 @@ export function bubbleTarget(scene, id, onPop, placement) {
       root.destroy();
       return;
     }
-    const burst = scene.add.circle(root.x, root.y, r, 0xffffff, 0).setStrokeStyle(5, 0xffffff, .9).setDepth(
-      15,
-    );
+    const burst = scene.add
+      .circle(root.x, root.y, r, 0xffffff, 0)
+      .setStrokeStyle(5, 0xffffff, 0.9)
+      .setDepth(15);
     scene.tweens.add({
       targets: burst,
       scale: 1.45,
@@ -91,13 +99,16 @@ export function bubbleTarget(scene, id, onPop, placement) {
 }
 
 export function paperAction(scene, x, y, text, fn) {
-  return scene.add.text(x, y, text, {
-    ...font,
-    fontSize: "27px",
-    backgroundColor: "#fff9e9",
-    padding: { x: 16, y: 13 },
-  })
-    .setOrigin(.5).setDepth(25).setInteractive({ useHandCursor: true })
+  return scene.add
+    .text(x, y, text, {
+      ...font,
+      fontSize: "27px",
+      backgroundColor: "#fff9e9",
+      padding: { x: 16, y: 13 },
+    })
+    .setOrigin(0.5)
+    .setDepth(25)
+    .setInteractive({ useHandCursor: true })
     .on("pointerdown", (_p, _x, _y, e) => {
       e.stopPropagation();
       if (!scene.blocked) fn();

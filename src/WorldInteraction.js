@@ -43,15 +43,18 @@ export function exitArrow(scene, id, x, y, action, direction = "left") {
   paint();
   const bounds = { x: x - 48, y: y - 32, w: 96, h: 64 };
   const zone = worldTarget(scene, id, bounds, action);
-  let minWidth = 96, minHeight = 64;
+  let minWidth = 96,
+    minHeight = 64;
   const resize = () => {
     const scale = scene.game.canvas.getBoundingClientRect().width / scene.scale.gameSize.width;
     const touchSize = Math.ceil(48 / (scale || 1));
-    const nextWidth = Math.max(96, touchSize), nextHeight = Math.max(64, touchSize);
+    const nextWidth = Math.max(96, touchSize),
+      nextHeight = Math.max(64, touchSize);
     // Keep the center and any editor-authored extra space when the viewport rotates.
     const w = Math.max(nextWidth, zone.width + nextWidth - minWidth);
     const h = Math.max(nextHeight, zone.height + nextHeight - minHeight);
-    const cx = zone.x + zone.width / 2, cy = zone.y + zone.height / 2;
+    const cx = zone.x + zone.width / 2,
+      cy = zone.y + zone.height / 2;
     Object.assign(bounds, { x: cx - w / 2, y: cy - h / 2, w, h });
     zone.setPosition(bounds.x, bounds.y).setSize(w, h);
     zone.input.hitArea.setSize(w, h);
@@ -60,7 +63,8 @@ export function exitArrow(scene, id, x, y, action, direction = "left") {
   };
   // Follow the hotspot if it is repositioned in Caper's editor or a saved layout.
   const sync = () => {
-    const w = Math.max(minWidth, zone.width), h = Math.max(minHeight, zone.height);
+    const w = Math.max(minWidth, zone.width),
+      h = Math.max(minHeight, zone.height);
     const cx = Math.max(w / 2 + 4, Math.min(1200 - w / 2 - 4, zone.x + zone.width / 2));
     const cy = Math.max(h / 2 + 4, Math.min(800 - h / 2 - 4, zone.y + zone.height / 2));
     if (zone.width !== w || zone.height !== h || zone.x !== cx - w / 2 || zone.y !== cy - h / 2) {

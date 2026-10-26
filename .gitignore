@@ -11,3 +11,4 @@ dist/
 assets/source-drawings/
 assets/audio/budget.json
 assets/audio/**/*.mp3.json
+.vite-plus/

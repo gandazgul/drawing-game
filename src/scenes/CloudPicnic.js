@@ -1,4 +1,4 @@
-import { store } from "@caper/engine";
+import { store } from "@gandazgul/caper-engine";
 import { PuzzleScene } from "./PuzzleScene.js";
 import { drawing } from "../DrawnWorld.js";
 import { font } from "../art.js";
@@ -87,18 +87,23 @@ export class CloudPicnic extends PuzzleScene {
   }
   label(x, y, text, style = {}) {
     return this.keep(
-      this.add.text(x, y, text, {
-        ...font,
-        backgroundColor: "#fff9e9",
-        padding: { x: 12, y: 7 },
-        ...style,
-      }).setOrigin(.5).setDepth(20),
+      this.add
+        .text(x, y, text, {
+          ...font,
+          backgroundColor: "#fff9e9",
+          padding: { x: 12, y: 7 },
+          ...style,
+        })
+        .setOrigin(0.5)
+        .setDepth(20),
     );
   }
   control(x, y, label, action) {
-    const button = this.keep(this.button(x, y, label, () => {
-      if (!this.turnLocked) action();
-    }));
+    const button = this.keep(
+      this.button(x, y, label, () => {
+        if (!this.turnLocked) action();
+      }),
+    );
     fingerRect(this, button);
     return button;
   }
@@ -139,7 +144,7 @@ export class CloudPicnic extends PuzzleScene {
     this.round = this.rounds[0];
     this.wordButtons = this.round.choices.map((word, i) => {
       const x = 455 + i * 275;
-      this.keep(this.add.rectangle(x + 3, 337, 235, 125, 0x292b4b, .12).setDepth(5));
+      this.keep(this.add.rectangle(x + 3, 337, 235, 125, 0x292b4b, 0.12).setDepth(5));
       const paper = this.keep(this.add.rectangle(x, 330, 235, 125, 0xfff9e9).setDepth(6));
       paper.setStrokeStyle(3, 0x7250a0);
       const text = this.label(x, 330, word, { ...print, fontSize: word.length > 5 ? "42px" : "48px" });
@@ -203,7 +208,7 @@ export class CloudPicnic extends PuzzleScene {
     this.tweens.add({
       targets: [paper, text],
       y: 570,
-      alpha: .25,
+      alpha: 0.25,
       duration: this.registry.get("reducedMotion") ? 100 : 500,
       ease: "Sine.easeInOut",
       onComplete: () => this.showWord(),
@@ -235,14 +240,11 @@ export class CloudPicnic extends PuzzleScene {
     this.control(600, 285, "Read it to me", () => this.placementHelp());
     this.picnic();
     this.placed.forEach((id) =>
-      this.keep(drawing(this, "pinkFruit", spots[id].fruit.x, spots[id].fruit.y, 54, 4))
+      this.keep(drawing(this, "pinkFruit", spots[id].fruit.x, spots[id].fruit.y, 54, 4)),
     );
     this.spotMarks = {};
     for (const [id, spot] of Object.entries(spots)) {
-      const mark = this.keep(
-        this.add.rectangle(spot.x, spot.y, spot.w, spot.h, 0xfff9e9, 0)
-          .setDepth(3),
-      );
+      const mark = this.keep(this.add.rectangle(spot.x, spot.y, spot.w, spot.h, 0xfff9e9, 0).setDepth(3));
       this.spotMarks[id] = mark;
       fingerRect(this, mark);
       mark.on("pointerdown", (_p, _x, _y, e) => {
@@ -272,8 +274,8 @@ export class CloudPicnic extends PuzzleScene {
     });
     target.on("dragend", (pointer) => {
       if (this.blocked || this.turnLocked) return;
-      const found = Object.entries(spots).find(([, s]) =>
-        Math.abs(pointer.x - s.x) <= s.w / 2 && Math.abs(pointer.y - s.y) <= s.h / 2
+      const found = Object.entries(spots).find(
+        ([, s]) => Math.abs(pointer.x - s.x) <= s.w / 2 && Math.abs(pointer.y - s.y) <= s.h / 2,
       );
       if (found) this.place(found[0]);
       if (!this.turnLocked) {
@@ -285,9 +287,11 @@ export class CloudPicnic extends PuzzleScene {
   }
   placementHelp() {
     this.ui.speak("Cloud friend", this.placement.phrase);
-    this.feedback.setPosition(700, 680).setWordWrapWidth(820).setText(this.placement.explanation).setFontSize(
-      25,
-    );
+    this.feedback
+      .setPosition(700, 680)
+      .setWordWrapWidth(820)
+      .setText(this.placement.explanation)
+      .setFontSize(25);
     this.ui.status(this.placement.explanation);
     this.spotMarks[this.placement.id].setStrokeStyle(4, 0x286d38);
   }

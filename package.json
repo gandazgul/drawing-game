@@ -1,0 +1,33 @@
+{
+  "name": "drawing-game",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vp dev --host 127.0.0.1",
+    "build": "vp build",
+    "preview": "vp preview --host 127.0.0.1",
+    "start": "node src/server.js",
+    "test": "vp test",
+    "test:watch": "vp test watch",
+    "check": "vp check",
+    "lint": "vp lint",
+    "fmt": "vp fmt",
+    "fmt:check": "vp fmt --check",
+    "voices:audition": "node scripts/voice-audition.js",
+    "voices:dialogue": "node scripts/voice-dialogue.js"
+  },
+  "dependencies": {
+    "@gandazgul/caper-engine": "0.5.1",
+    "phaser": "3.90.0",
+    "sirv": "3.0.2"
+  },
+  "devDependencies": {
+    "playwright": "1.61.1",
+    "sharp": "0.34.5",
+    "vite-plus": "1.4.0"
+  },
+  "engines": {
+    "node": ">=26.12.1 <27"
+  },
+  "packageManager": "pnpm@12.6.0"
+}

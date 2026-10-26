@@ -8,7 +8,8 @@ for (let head = 0; head < queue.length; head++) {
   const { board, distance } = queue[head];
   for (let i = 0; i < 6; i++) {
     if (!adjacent(i, board.indexOf(0), 3)) continue;
-    const next = slide(board, i), key = next.join();
+    const next = slide(board, i),
+      key = next.join();
     if (reachable.has(key)) continue;
     const entry = { board: next, distance: distance + 1 };
     reachable.set(key, entry);
@@ -16,16 +17,22 @@ for (let head = 0; head < queue.length; head++) {
   }
 }
 const valid = (board) =>
-  Array.isArray(board) && board.length === 6 &&
-  board.every((n) => Number.isInteger(n) && n >= 0 && n < 6) && reachable.has(board.join());
+  Array.isArray(board) &&
+  board.length === 6 &&
+  board.every((n) => Number.isInteger(n) && n >= 0 && n < 6) &&
+  reachable.has(board.join());
 export function boxSession(raw, random = Math.random) {
   if (
-    raw?.complete !== true && valid(raw?.board) && valid(raw?.start) && raw.start.join() !== BOX_GOAL.join()
+    raw?.complete !== true &&
+    valid(raw?.board) &&
+    valid(raw?.start) &&
+    raw.start.join() !== BOX_GOAL.join()
   ) {
     return { board: [...raw.board], start: [...raw.start], complete: false };
   }
-  const choices = queue.filter(({ board, distance }) =>
-    distance >= 6 && distance <= 12 && board.join() !== (Array.isArray(raw?.start) ? raw.start.join() : "")
+  const choices = queue.filter(
+    ({ board, distance }) =>
+      distance >= 6 && distance <= 12 && board.join() !== (Array.isArray(raw?.start) ? raw.start.join() : ""),
   );
   const board = choices[Math.floor(random() * choices.length)].board;
   return { board: [...board], start: [...board], complete: false };

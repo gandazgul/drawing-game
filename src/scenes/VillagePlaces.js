@@ -1,4 +1,4 @@
-import { store } from "@caper/engine";
+import { store } from "@gandazgul/caper-engine";
 import { WorldScene } from "./WorldScene.js";
 import { drawing, drawnCritters, hiddenStickers } from "../DrawnWorld.js";
 import { exitArrow, objectTarget, worldTarget } from "../WorldInteraction.js";
@@ -15,8 +15,13 @@ function world(key, background = "villageBackdrop") {
   return {
     key,
     backgroundsByChapter: { paint: background },
-    walkable: [{ x: 90, y: 645 }, { x: 1100, y: 645 }, { x: 1100, y: 732 }, { x: 90, y: 732 }],
-    characterScales: { keila: .22, olivia: .227 },
+    walkable: [
+      { x: 90, y: 645 },
+      { x: 1100, y: 645 },
+      { x: 1100, y: 732 },
+      { x: 90, y: 732 },
+    ],
+    characterScales: { keila: 0.22, olivia: 0.227 },
     companionSpacing: 94,
     activeCharacter: { startPosition: { x: 380, y: 710 } },
     props: [],
@@ -52,15 +57,18 @@ export class InnGarden extends WorldScene {
       if (tasks().includes("garden")) this.ui.dialogue(DIALOGUE.innGardenThanks);
       else this.askForBeeHelp();
     });
-    [[140, 555, "flowerBlue", 160], [390, 598, "birthdayFlowers", 180], [580, 555, "sunflower", 100], [
-      90,
-      748,
-      "flowers",
-      130,
-    ]].forEach(([x, y, k, w]) => drawing(this, k, x, y, w));
-    drawnCritters(this, [["bee", 240, 370, 92], ["heartButterfly", 580, 210, 88]]);
+    [
+      [140, 555, "flowerBlue", 160],
+      [390, 598, "birthdayFlowers", 180],
+      [580, 555, "sunflower", 100],
+      [90, 748, "flowers", 130],
+    ].forEach(([x, y, k, w]) => drawing(this, k, x, y, w));
+    drawnCritters(this, [
+      ["bee", 240, 370, 92],
+      ["heartButterfly", 580, 210, 88],
+    ]);
     if (tasks().includes("garden")) {
-      strokes(this, "village_garden", (p) => ({ x: p.x * .7, y: p.y * .57 + 250 }));
+      strokes(this, "village_garden", (p) => ({ x: p.x * 0.7, y: p.y * 0.57 + 250 }));
     }
     worldTarget(this, "bee-path", { x: 100, y: 300, w: 570, h: 310 }, () => {
       if (!tasks().includes("garden")) openTask(this, "garden");
@@ -108,7 +116,7 @@ export class BirthdayYard extends WorldScene {
       const colors = store.get("village_bunting") || [1, 0, 1, 2, 3, 4, 0, 0, 2];
       this.add.graphics().lineStyle(4, 0x513272).lineBetween(200, 200, 1010, 200);
       colors.forEach((color, i) =>
-        this.add.triangle(225 + i * 94, 229, 0, 0, 70, 0, 35, 60, COLORS[color]).setStrokeStyle(2, 0x513272)
+        this.add.triangle(225 + i * 94, 229, 0, 0, 70, 0, 35, 60, COLORS[color]).setStrokeStyle(2, 0x513272),
       );
     }
     if (branchDone(tasks(), "birthday")) {
@@ -129,21 +137,19 @@ export class BirthdayYard extends WorldScene {
     if (partyTask === "bunting") {
       this.add.graphics().lineStyle(4, 0x513272).lineBetween(200, 200, 1010, 200);
       [260, 480, 700, 920].forEach((x) =>
-        this.add.triangle(x, 229, 0, 0, 70, 0, 35, 60, 0xfff9e9).setStrokeStyle(3, 0x513272)
+        this.add.triangle(x, 229, 0, 0, 70, 0, 35, 60, 0xfff9e9).setStrokeStyle(3, 0x513272),
       );
     }
-    const partyBounds = partyTask === "bunting"
-      ? { x: 190, y: 170, w: 850, h: 110 }
-      : partyTask === "cake"
-      ? { x: 430, y: 350, w: 245, h: 260 }
-      : { x: 730, y: 350, w: 175, h: 240 };
+    const partyBounds =
+      partyTask === "bunting"
+        ? { x: 190, y: 170, w: 850, h: 110 }
+        : partyTask === "cake"
+          ? { x: 430, y: 350, w: 245, h: 260 }
+          : { x: 730, y: 350, w: 175, h: 240 };
     if (partyTask) worldTarget(this, "party-task", partyBounds, () => openTask(this, partyTask));
     if (tasks().includes("bunting")) {
-      worldTarget(
-        this,
-        "party-flags-replay",
-        { x: 190, y: 170, w: 850, h: 110 },
-        () => openTask(this, "bunting"),
+      worldTarget(this, "party-flags-replay", { x: 190, y: 170, w: 850, h: 110 }, () =>
+        openTask(this, "bunting"),
       );
     }
     hiddenStickers(this);
@@ -207,7 +213,7 @@ export class House extends WorldScene {
         { x: 48, y: -23 },
       ]);
       if (id === "clue") {
-        plan.lineStyle(9, 0x7250a0, .65);
+        plan.lineStyle(9, 0x7250a0, 0.65);
         for (let n = 0; n < 6; n++) plan.lineBetween(-62, -35 + n * 14, 61, -24 + n * 11);
       }
       worldTarget(this, "stair-plan", { x: 715, y: 490, w: 160, h: 110 }, () => openTask(this, id));
@@ -282,9 +288,15 @@ export class HouseLoft extends WorldScene {
     }
     super.create(data);
     this.ui.setScene(this, "The house loft");
-    worldTarget(this, "loft-stairs-down", { x: 0, y: 470, w: 175, h: 180 }, () => {
-      this.scene.start("House");
-    }, { x: 150, y: 650 });
+    worldTarget(
+      this,
+      "loft-stairs-down",
+      { x: 0, y: 470, w: 175, h: 180 },
+      () => {
+        this.scene.start("House");
+      },
+      { x: 150, y: 650 },
+    );
     drawing(this, "mouse", 115, 673, 75, 3);
     drawing(this, "flowerVase", 240, 535, 95, 3);
     worldTarget(this, "picture-box", { x: 775, y: 450, w: 260, h: 240 }, () => {

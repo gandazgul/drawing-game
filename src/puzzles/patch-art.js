@@ -3,7 +3,8 @@ import { BRUSH_RADIUS, PATCH } from "./geometry.js";
 // Replay the original repair coordinates into a clipped, boat-sized texture.
 // Drawing at the original resolution preserves strokes, overlaps and brush width.
 export function drawPatch(ctx, strokes, palette, fallback) {
-  const width = PATCH.rx * 2, height = PATCH.ry * 2;
+  const width = PATCH.rx * 2,
+    height = PATCH.ry * 2;
   const cssColor = (color) => `#${color.toString(16).padStart(6, "0")}`;
   ctx.clearRect(0, 0, width, height);
   ctx.save();
