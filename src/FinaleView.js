@@ -6,9 +6,9 @@ export function treeHouses(scene, done) {
   // Four different homes from the makers' pages, each seated on its own branch.
   // Widths account for the narrow orange house and the tall chimney silhouette.
   return [
-    ["house", 440, 320, 132],
+    ["birthdayHouse", 440, 320, 132],
     ["orangeHouse", 890, 332, 104],
-    ["birthdayHouse", 400, 216, 100],
+    ["house", 400, 216, 100],
     ["studioExterior", 700, 137, 66],
   ].map(([key, x, y, w]) => drawing(scene, key, x, y, w, 2).setAlpha(done ? 1 : .5));
 }

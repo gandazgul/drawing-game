@@ -116,7 +116,7 @@ export class TreeAssembly extends PuzzleScene {
     this.selected = null;
     this.done = false;
     this.placed = validIds(store.get("endingHousePlaced"), 6);
-    const source = this.textures.get("house").getSourceImage();
+    const source = this.textures.get("birthdayHouse").getSourceImage();
     const texture = this.textures.exists("endingHouseParts")
       ? this.textures.get("endingHouseParts")
       : this.textures.addImage("endingHouseParts", source);
@@ -208,7 +208,7 @@ export class TreeAssembly extends PuzzleScene {
     sparkleBurst(this, 600, 390, true);
     this.feedback.setText("Bounka is finishing the door!");
     const helper = drawing(this, "bounkaKind", 940, 628, 125, 8);
-    const door = this.add.rectangle(700, 555, 38, 70, 0xb53e69).setStrokeStyle(3, 0x66418d).setDepth(7)
+    const door = this.add.ellipse(620, 465, 14, 22, 0xf9df70).setStrokeStyle(3, 0x26798c).setDepth(7)
       .setAlpha(0);
     this.tweens.add({
       targets: helper,
@@ -216,7 +216,7 @@ export class TreeAssembly extends PuzzleScene {
       duration: this.registry.get("reducedMotion") ? 100 : 900,
       onComplete: () => {
         this.tweens.add({ targets: door, alpha: 1, duration: 400 });
-        sparkleBurst(this, 700, 535);
+        sparkleBurst(this, 620, 465);
         store.set("endingHouseDone", true);
         this.ui.setBusy(false);
         this.ui.dialogue(DIALOGUE.endingDoor, () => this.scene.start("TreeClearing"));

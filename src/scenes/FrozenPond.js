@@ -27,8 +27,7 @@ export class FrozenPond extends WorldScene {
     if (unlocked) store.set("snowBuilderUnlocked", true);
     this.penguin = drawing(this, "penguin", 625, 505, 125, 4);
     objectTarget(this, "penguin", this.penguin, () => {
-      if (unlocked) this.ui.dialogue(DIALOGUE.snowReady);
-      else this.scene.start("PenguinSlide");
+      this.scene.start("PenguinSlide");
     }, { x: 615, y: 640 });
     const pieces = validSnowPieces(store.get("snowPieces"));
     if (pieces.length) {
@@ -56,7 +55,7 @@ export class FrozenPond extends WorldScene {
     hiddenStickers(this);
     this.ui.status(
       unlocked
-        ? "Tap your snow friend to build and decorate whenever you like."
+        ? "Tap the penguin to play again, or your snow friend to decorate."
         : "Tap the penguin. Let's gather twigs, a carrot, and rocks!",
     );
     if (!store.get("snowMetPenguin")) {

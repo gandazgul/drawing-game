@@ -48,7 +48,10 @@ export class PenguinSlide extends PuzzleScene {
     this.elapsed = 0;
     this.tapMode = false;
     this.holdPointer = null;
-    this.found = materialsFound(store.get("snowMaterials"));
+    const savedMaterials = materialsFound(store.get("snowMaterials"));
+    this.replay = snowUnlocked(savedMaterials, store.get("snowBuilderUnlocked"));
+    // Replays collect a fresh set for this visit without changing the permanent supplies.
+    this.found = this.replay ? [] : savedMaterials;
     this.add.graphics().lineStyle(5, 0x497e91, .6).lineBetween(175, 462, 1030, 462);
     this.targetRing = this.add.ellipse(600, 462, 200, 65, 0xe3f4ac, .65).setStrokeStyle(4, 0x386a40);
     this.penguin = this.add.image(180, 455, "penguin").setOrigin(.5, 1).setDisplaySize(110, 165);
@@ -81,6 +84,7 @@ export class PenguinSlide extends PuzzleScene {
       );
       this.refreshButton();
     });
+    this.replayButton = this.button(1010, 751, "Play again", () => this.scene.restart()).setVisible(false);
     const release = (p) => {
       if (!this.tapMode && p.id === this.holdPointer) this.release();
     };
@@ -114,10 +118,11 @@ export class PenguinSlide extends PuzzleScene {
     this.collectedIcons.forEach((icon, i) => icon.setAlpha(this.found.includes(MATERIALS[i]) ? 1 : .25));
     this.penguin.setPosition(180, 455).setAngle(0);
     if (!this.currentMaterial) {
-      store.set("snowBuilderUnlocked", true);
+      if (!this.replay) store.set("snowBuilderUnlocked", true);
       this.targetRing.setVisible(false);
       this.material.setVisible(false);
       this.modeButton.setVisible(false);
+      this.replayButton.setVisible(true);
       this.feedback.setText("Twigs, carrot, rocks — we have everything!");
       this.holdButton.setFillStyle(0xf9df70).setAlpha(1);
       this.holdLabel.setText("Build our\nsnow friend").setColor("#30304c");
@@ -195,10 +200,12 @@ export class PenguinSlide extends PuzzleScene {
       onComplete: () => {
         if (hit) {
           this.found = materialsFound([...this.found, this.currentMaterial]);
-          store.batch(() => {
-            store.set("snowMaterials", this.found);
-            if (this.found.length === 3) store.set("snowBuilderUnlocked", true);
-          });
+          if (!this.replay) {
+            store.batch(() => {
+              store.set("snowMaterials", this.found);
+              if (this.found.length === 3) store.set("snowBuilderUnlocked", true);
+            });
+          }
           this.feedback.setText("Got them! Back to our snow pile.");
           if (this.ui.effectsOn) this.sound.play("bubblePop", { volume: .3 });
         } else this.feedback.setText("Another slide! Let go in the green patch.");
