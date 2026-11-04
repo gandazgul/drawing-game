@@ -36,6 +36,13 @@ pnpm preview
 The Containerfile packages a host-built `dist/` and runs the Node.js server as a
 non-root user. Build locally with `pnpm build`, then `podman build -t drawing-game .`.
 
+## Install as an app
+
+Serve the production build over HTTPS, then use Chrome's **Install** option (on
+Android, under **Add to home screen**). The app opens in its own window. Installation
+does not enable offline play; the game still needs a connection to load its assets.
+See [PWA.md](PWA.md) for icon generation, validation, and Google Kids Space notes.
+
 Saves and player drawings are stored locally in each browser. Voice recordings
 ship with the game; playback does not contact a TTS service or incur API charges.
 The optional generation scripts require your own Google Cloud project and explicit

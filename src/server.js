@@ -9,6 +9,8 @@ export function createStaticServer(root = fileURLToPath(new URL("../dist/", impo
     dotfiles: false,
     single: false,
     setHeaders(response, path) {
+      // sirv's MIME table omits .ico; keep the fallback favicon usable with nosniff.
+      if (path.endsWith(".ico")) response.setHeader("Content-Type", "image/vnd.microsoft.icon");
       response.setHeader(
         "Cache-Control",
         /^\/assets\/.+-[\w-]{8,}\.[\w]+$/.test(path) ? "public, max-age=31536000, immutable" : "no-cache",

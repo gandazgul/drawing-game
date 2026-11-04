@@ -13,6 +13,7 @@
     "lint": "vp lint",
     "fmt": "vp fmt",
     "fmt:check": "vp fmt --check",
+    "icons": "node scripts/app-icons.js",
     "voices:audition": "node scripts/voice-audition.js",
     "voices:dialogue": "node scripts/voice-dialogue.js"
   },

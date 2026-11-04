@@ -1,6 +1,6 @@
 import { afterAll, assert, beforeAll, test } from "vite-plus/test";
 import { once } from "node:events";
-import { mkdtemp, mkdir, rm, writeFile } from "node:fs/promises";
+import { copyFile, mkdtemp, mkdir, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { createStaticServer } from "../src/server.js";
@@ -12,6 +12,8 @@ beforeAll(async () => {
   await writeFile(join(root, "index.html"), "<!doctype html><title>Drawing world</title>");
   await writeFile(join(root, "assets/song-abcdefgh.mp3"), "0123456789");
   await writeFile(join(root, ".secret"), "private");
+  for (const file of ["favicon.ico", "manifest.webmanifest"])
+    await copyFile(new URL(`../public/${file}`, import.meta.url), join(root, file));
   server = createStaticServer(root);
   server.listen(0, "127.0.0.1");
   await once(server, "listening");
@@ -38,6 +40,19 @@ test("static server rejects writes", async () => {
   assert.equal(response.status, 405);
   assert.equal(response.headers.get("Allow"), "GET, HEAD");
   await response.text();
+});
+
+test("installation metadata and fallback favicon have usable MIME types and revalidate", async () => {
+  for (const [file, type] of [
+    ["favicon.ico", "image/vnd.microsoft.icon"],
+    ["manifest.webmanifest", "application/manifest+json"],
+  ]) {
+    const response = await fetch(`${base}/${file}`);
+    assert.equal(response.status, 200);
+    assert.equal(response.headers.get("Content-Type"), type);
+    assert.equal(response.headers.get("Cache-Control"), "no-cache");
+    assert.isAbove((await response.arrayBuffer()).byteLength, 0);
+  }
 });
 
 test("serves the index and HEAD with revalidation and security headers", async () => {
