@@ -39,6 +39,20 @@ personal metadata, or external image references.
 At each size, the manifest declares the same mask-safe image twice. The entries
 are identical except for `purpose: any` and `purpose: maskable`, as requested.
 
+## Install-dialog screenshots
+
+The manifest includes two real gameplay captures under `public/screenshots/`:
+1280×800 desktop (`form_factor: wide`) and 840×560 mobile landscape
+(`form_factor: narrow`). The form factor identifies the device class; a mobile
+screenshot can show landscape gameplay. Each entry declares its actual dimensions,
+JPEG type, and an accessible label so Chrome can offer its richer install UI on
+both device classes.
+
+The captures show the harbor after skipping the opening conversation in a fresh
+browser profile, without saved drawings or editor overlays. When refreshing them,
+capture the running production build at the same viewport sizes and update the
+manifest dimensions if those sizes change.
+
 ## Google Kids Space
 
 Google does not document a separate Kids Space favicon or web-manifest icon member

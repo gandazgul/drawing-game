@@ -34,5 +34,21 @@
       "type": "image/png",
       "purpose": "maskable"
     }
+  ],
+  "screenshots": [
+    {
+      "src": "./screenshots/harbor-desktop.jpg",
+      "sizes": "1280x800",
+      "type": "image/jpeg",
+      "form_factor": "wide",
+      "label": "Keila and Olivia exploring the painted harbor on desktop."
+    },
+    {
+      "src": "./screenshots/harbor-mobile.jpg",
+      "sizes": "840x560",
+      "type": "image/jpeg",
+      "form_factor": "narrow",
+      "label": "Keila and Olivia exploring the painted harbor on mobile in landscape."
+    }
   ]
 }
